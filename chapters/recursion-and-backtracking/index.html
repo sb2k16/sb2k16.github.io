@@ -1,0 +1,1254 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Recursion and Backtracking — Data Structures on Real Hardware</title><meta name="description" content="The call stack as a data structure, and pruning as the only thing that makes search tractable."><link rel="canonical" href="https://sb2k16.github.io/chapters/recursion-and-backtracking/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="sitemap" href="/sitemap-index.xml"><meta property="og:type" content="article"><meta property="og:title" content="Recursion and Backtracking"><meta property="og:description" content="The call stack as a data structure, and pruning as the only thing that makes search tractable."><meta property="og:url" content="https://sb2k16.github.io/chapters/recursion-and-backtracking/"><meta property="og:image" content="https://sb2k16.github.io/og-default.png"><meta property="og:site_name" content="Data Structures on Real Hardware"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Recursion and Backtracking"><meta name="twitter:description" content="The call stack as a data structure, and pruning as the only thing that makes search tractable."><meta name="twitter:image" content="https://sb2k16.github.io/og-default.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Recursion and Backtracking","headline":"Recursion and Backtracking","description":"The call stack as a data structure, and pruning as the only thing that makes search tractable.","url":"https://sb2k16.github.io/chapters/recursion-and-backtracking/","author":{"@type":"Person","name":"Souvik Bhattacherjee"}}</script><script>
+      const stored = localStorage.getItem('theme');
+      if (stored === 'dark' || stored === 'light') {
+        document.documentElement.dataset.theme = stored;
+      }
+    </script><link rel="stylesheet" href="/_astro/Base.CoKL3ywM.css"></head><body><a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:px-3 focus:py-2" style="background: var(--surface-1); color: var(--text-primary)">Skip to content</a><header class="sticky top-0 z-40 border-b backdrop-blur" style="border-color: var(--border); background: color-mix(in srgb, var(--surface-1) 88%, transparent)"><nav class="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5"><a href="/" class="flex items-center gap-2 text-sm font-semibold no-underline" style="color: var(--text-primary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="8" width="20" height="8" rx="1.5" stroke="var(--accent)" stroke-width="1.8"></rect><path d="M7 8v8M12 8v8M17 8v8" stroke="var(--accent)" stroke-width="1.8"></path></svg>Real Hardware</a><div class="ml-auto flex items-center gap-1 text-sm"><a href="/chapters" class="rounded-md px-2.5 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:px-3" style="color: var(--text-secondary)">Chapters</a><a href="/chapters/memory-hierarchy" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)">Benchmarks</a><a href="https://github.com/sb2k16/data-structures-book" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)" rel="noopener">GitHub</a><button id="theme-toggle" type="button" aria-label="Toggle color theme" class="rounded-md p-2 transition-colors" data-astro-cid-l6lhmie6><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" class="sun-core" data-astro-cid-l6lhmie6></circle><g class="sun-rays" data-astro-cid-l6lhmie6><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-l6lhmie6></path></g><path class="moon" d="M20 14.5A8 8 0 019.5 4 8.5 8.5 0 1020 14.5z" fill="currentColor" stroke="none" data-astro-cid-l6lhmie6></path></svg></button><script type="module">var e=document.documentElement;document.getElementById(`theme-toggle`)?.addEventListener(`click`,()=>{let t=(e.dataset.theme??(matchMedia(`(prefers-color-scheme: dark)`).matches?`dark`:`light`))===`dark`?`light`:`dark`;e.dataset.theme=t,localStorage.setItem(`theme`,t)});</script></div></nav></header><main id="main"><div class="mx-auto max-w-6xl px-5 py-12 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12"><article class="min-w-0"><header class="mb-10"><div class="text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">Chapter 8 · Non-Linear Structures</div><h1 class="mt-2 text-3xl font-bold leading-tight tracking-tight sm:text-4xl" style="color: var(--text-primary)">Recursion and Backtracking</h1><p class="mt-3 max-w-2xl text-base leading-relaxed" style="color: var(--text-secondary)">The call stack as a data structure, and pruning as the only thing that makes search tractable.</p></header><div class="prose"><h2 id="81-problem-statement--motivation"><a class="heading-anchor" href="#81-problem-statement--motivation">8.1 Problem Statement &#x26; Motivation</a></h2>
+<h3 id="what-problem-do-recursion-and-backtracking-solve"><a class="heading-anchor" href="#what-problem-do-recursion-and-backtracking-solve">What Problem Do Recursion and Backtracking Solve?</a></h3>
+<p>Many problems have natural recursive structure that makes iterative solutions complex:</p>
+<ul>
+<li><strong>Hierarchical Structures</strong>: Trees, graphs have recursive structure</li>
+<li><strong>Combinatorial Problems</strong>: Generating all permutations, combinations, subsets</li>
+<li><strong>Optimization with Constraints</strong>: Finding valid solutions under constraints</li>
+<li><strong>Divide and Conquer</strong>: Problems that break into similar subproblems</li>
+<li><strong>State Space Exploration</strong>: Systematically exploring all possibilities</li>
+</ul>
+<p><strong>Naive Approaches and Their Limitations</strong>:</p>
+<ul>
+<li><strong>Iterative Solutions</strong>: Often complex, hard to reason about</li>
+<li><strong>Nested Loops</strong>: Don’t scale for variable-depth problems</li>
+<li><strong>Manual State Management</strong>: Error-prone, hard to maintain</li>
+<li><strong>No Systematic Exploration</strong>: May miss solutions or explore inefficiently</li>
+</ul>
+<p><strong>The Recursion/Backtracking Solution</strong>: Recursion provides elegant expression of recursive problems, while backtracking systematically explores solution spaces, making complex problems manageable.</p>
+<h3 id="when-to-use-recursion"><a class="heading-anchor" href="#when-to-use-recursion">When to Use Recursion</a></h3>
+<p>✅ <strong>Use recursion when</strong>:</p>
+<ul>
+<li>Problem has natural recursive structure (trees, graphs)</li>
+<li>Solution is clearer with recursion</li>
+<li>Divide and conquer approach fits</li>
+<li>Backtracking is needed</li>
+<li>Mathematical problems with recursive definitions</li>
+</ul>
+<p>✅ <strong>Real-world applications</strong>:</p>
+<ul>
+<li>Tree/graph traversal (DFS)</li>
+<li>File system navigation</li>
+<li>Parsing (expression trees, syntax trees)</li>
+<li>Combinatorial generation (permutations, combinations)</li>
+<li>Constraint satisfaction (N-Queens, Sudoku)</li>
+<li>Dynamic programming (memoization)</li>
+</ul>
+<h3 id="when-not-to-use-recursion"><a class="heading-anchor" href="#when-not-to-use-recursion">When NOT to Use Recursion</a></h3>
+<p>❌ <strong>Avoid recursion when</strong>:</p>
+<ul>
+<li>Simple loops suffice</li>
+<li>Performance is critical (recursion has overhead)</li>
+<li>Stack overflow is a concern (deep recursion)</li>
+<li>Tail recursion can be optimized to iteration</li>
+<li>Problem doesn’t have recursive structure</li>
+</ul>
+<p><strong>Key Trade-off</strong>: Recursion trades performance (function call overhead, stack space) for clarity and natural problem expression.</p>
+<h2 id="82-conceptual-overview"><a class="heading-anchor" href="#82-conceptual-overview">8.2 Conceptual Overview</a></h2>
+<p><strong>Recursion</strong> is a fundamental programming technique where a function calls itself to solve a problem. <strong>Backtracking</strong> is a systematic method for exploring solution spaces by trying partial solutions and abandoning them if they cannot lead to a complete solution.</p>
+<h3 id="intuitive-explanation"><a class="heading-anchor" href="#intuitive-explanation">Intuitive Explanation</a></h3>
+<p>Think of recursion like Russian nesting dolls:</p>
+<ul>
+<li><strong>Base Case</strong>: Smallest doll (simplest problem)</li>
+<li><strong>Recursive Case</strong>: Larger doll contains smaller doll (problem contains subproblem)</li>
+<li><strong>Unwinding</strong>: Opening dolls one by one (solving subproblems)</li>
+</ul>
+<p>Think of backtracking like exploring a maze:</p>
+<ul>
+<li><strong>Try Path</strong>: Go down a path</li>
+<li><strong>Check Validity</strong>: Is this path valid?</li>
+<li><strong>Backtrack</strong>: If invalid, go back and try another path</li>
+<li><strong>Systematic</strong>: Try all possible paths</li>
+</ul>
+<h3 id="key-characteristics"><a class="heading-anchor" href="#key-characteristics">Key Characteristics</a></h3>
+<p><strong>Recursion</strong>:</p>
+<ol>
+<li><strong>Base Case</strong>: Condition that stops recursion</li>
+<li><strong>Recursive Case</strong>: Function calls itself on smaller problem</li>
+<li><strong>Progress</strong>: Each call moves toward base case</li>
+</ol>
+<p><strong>Backtracking</strong>:</p>
+<ol>
+<li><strong>Build Solution</strong>: Construct solution incrementally</li>
+<li><strong>Check Constraints</strong>: Verify partial solution is valid</li>
+<li><strong>Prune</strong>: Abandon invalid partial solutions early</li>
+<li><strong>Backtrack</strong>: Undo choices and try alternatives</li>
+</ol>
+<h3 id="the-recursive-thinking-pattern"><a class="heading-anchor" href="#the-recursive-thinking-pattern">The Recursive Thinking Pattern</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>1. Identify the base case(s) - simplest version of the problem</span></span>
+<span class="line"><span>2. Identify the recursive case - how to break down the problem</span></span>
+<span class="line"><span>3. Ensure progress - each call moves toward the base case</span></span>
+<span class="line"><span>4. Combine results - how to combine subproblem solutions</span></span></code></pre>
+<h3 id="the-backtracking-pattern"><a class="heading-anchor" href="#the-backtracking-pattern">The Backtracking Pattern</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>1. Make a choice (add to partial solution)</span></span>
+<span class="line"><span>2. Check if choice is valid (constraints satisfied)</span></span>
+<span class="line"><span>3. If valid, recurse to extend solution</span></span>
+<span class="line"><span>4. If invalid or recursion fails, undo choice (backtrack)</span></span>
+<span class="line"><span>5. Try next choice</span></span></code></pre>
+<h2 id="83-abstract-model--invariants--mandatory"><a class="heading-anchor" href="#83-abstract-model--invariants--mandatory">8.3 Abstract Model &#x26; Invariants ⭐ (Mandatory)</a></h2>
+<p><strong>Purpose</strong>: Define correctness independent of implementation.</p>
+<h3 id="abstract-model"><a class="heading-anchor" href="#abstract-model">Abstract Model</a></h3>
+<p>A recursive solution consists of:</p>
+<ul>
+<li><strong>Problem Space</strong>: Set of all problem instances</li>
+<li><strong>Base Cases</strong>: Terminal problems with known solutions</li>
+<li><strong>Recursive Decomposition</strong>: Function that breaks problem into subproblems</li>
+<li><strong>Combination Function</strong>: How to combine subproblem solutions</li>
+</ul>
+<p>A backtracking solution consists of:</p>
+<ul>
+<li><strong>State Space</strong>: All possible partial solutions</li>
+<li><strong>Valid States</strong>: Partial solutions satisfying constraints</li>
+<li><strong>Goal States</strong>: Complete valid solutions</li>
+<li><strong>Transition Function</strong>: How to extend partial solutions</li>
+</ul>
+<h3 id="core-invariants"><a class="heading-anchor" href="#core-invariants">Core Invariants</a></h3>
+<p>These invariants must <strong>always</strong> hold for recursive/backtracking solutions:</p>
+<h4 id="1-termination-invariant-recursion"><a class="heading-anchor" href="#1-termination-invariant-recursion">1. Termination Invariant (Recursion)</a></h4>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>For any recursive call:</span></span>
+<span class="line"><span>  - Problem size decreases toward base case</span></span>
+<span class="line"><span>  - Eventually reaches base case</span></span>
+<span class="line"><span>  - No infinite recursion</span></span></code></pre>
+<p><strong>Meaning</strong>: Every recursive path eventually terminates.</p>
+<h4 id="2-correctness-invariant-recursion"><a class="heading-anchor" href="#2-correctness-invariant-recursion">2. Correctness Invariant (Recursion)</a></h4>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>For any problem instance:</span></span>
+<span class="line"><span>  - Base case returns correct solution</span></span>
+<span class="line"><span>  - Recursive case combines correct subproblem solutions</span></span>
+<span class="line"><span>  - Final solution is correct</span></span></code></pre>
+<p><strong>Meaning</strong>: Recursive solution correctly solves the problem.</p>
+<h4 id="3-progress-invariant-backtracking"><a class="heading-anchor" href="#3-progress-invariant-backtracking">3. Progress Invariant (Backtracking)</a></h4>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>For any backtracking step:</span></span>
+<span class="line"><span>  - Partial solution is extended or backtracked</span></span>
+<span class="line"><span>  - All valid extensions are tried</span></span>
+<span class="line"><span>  - Invalid partial solutions are pruned early</span></span></code></pre>
+<p><strong>Meaning</strong>: Backtracking makes progress toward finding all solutions.</p>
+<h4 id="4-completeness-invariant-backtracking"><a class="heading-anchor" href="#4-completeness-invariant-backtracking">4. Completeness Invariant (Backtracking)</a></h4>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>For backtracking search:</span></span>
+<span class="line"><span>  - All valid solutions are found</span></span>
+<span class="line"><span>  - No valid solution is missed</span></span>
+<span class="line"><span>  - Invalid solutions are not included</span></span></code></pre>
+<p><strong>Meaning</strong>: Backtracking finds all valid solutions.</p>
+<h4 id="5-constraint-invariant-backtracking"><a class="heading-anchor" href="#5-constraint-invariant-backtracking">5. Constraint Invariant (Backtracking)</a></h4>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>For any partial solution:</span></span>
+<span class="line"><span>  - All constraints are satisfied</span></span>
+<span class="line"><span>  - Invalid partial solutions are rejected immediately</span></span>
+<span class="line"><span>  - Only valid extensions are explored</span></span></code></pre>
+<p><strong>Meaning</strong>: All explored states satisfy constraints.</p>
+<h3 id="assumptions"><a class="heading-anchor" href="#assumptions">Assumptions</a></h3>
+<ol>
+<li><strong>Finite Problem Space</strong>: Problem instances are finite</li>
+<li><strong>Well-Defined Base Cases</strong>: Base cases have clear solutions</li>
+<li><strong>Monotonic Constraints</strong>: Constraints can be checked incrementally</li>
+<li><strong>Deterministic</strong>: Same input produces same output</li>
+<li><strong>Stack Space Available</strong>: Sufficient stack space for recursion depth</li>
+</ol>
+<p>This abstract model provides the intellectual backbone for understanding recursion and backtracking correctness.</p>
+<h2 id="84-operations--interface"><a class="heading-anchor" href="#84-operations--interface">8.4 Operations &#x26; Interface</a></h2>
+<p><strong>Purpose</strong>: Define what operations are supported.</p>
+<p>Recursion and backtracking support the following conceptual operations:</p>
+<div class="table-scroll">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Operation</th><th>Description</th><th>Precondition</th><th>Postcondition</th></tr></thead><tbody><tr><td><code>solve(problem)</code></td><td>Solve problem recursively</td><td>Problem is valid</td><td>Returns solution</td></tr><tr><td><code>backtrack(state)</code></td><td>Explore state space</td><td>State is valid partial solution</td><td>Returns all valid solutions</td></tr><tr><td><code>isBaseCase(problem)</code></td><td>Check if base case</td><td>Problem is valid</td><td>Returns true if base case</td></tr><tr><td><code>decompose(problem)</code></td><td>Break into subproblems</td><td>Problem is not base case</td><td>Returns list of subproblems</td></tr><tr><td><code>combine(solutions)</code></td><td>Combine subproblem solutions</td><td>Solutions are valid</td><td>Returns combined solution</td></tr><tr><td><code>isValid(state)</code></td><td>Check if state is valid</td><td>State is partial solution</td><td>Returns true if constraints satisfied</td></tr><tr><td><code>isComplete(state)</code></td><td>Check if state is complete</td><td>State is partial solution</td><td>Returns true if complete solution</td></tr><tr><td><code>extend(state, choice)</code></td><td>Add choice to state</td><td>State and choice are valid</td><td>Returns extended state</td></tr><tr><td><code>undo(state, choice)</code></td><td>Remove choice from state</td><td>State contains choice</td><td>Returns state without choice</td></tr></tbody></table></div>
+<h3 id="behavioral-guarantees"><a class="heading-anchor" href="#behavioral-guarantees">Behavioral Guarantees</a></h3>
+<ol>
+<li><strong>Termination</strong>: All recursive calls eventually terminate</li>
+<li><strong>Correctness</strong>: Solutions are correct for the problem</li>
+<li><strong>Completeness</strong>: All valid solutions are found (backtracking)</li>
+<li><strong>Constraint Satisfaction</strong>: All solutions satisfy constraints</li>
+</ol>
+<h2 id="85-time--space-complexity"><a class="heading-anchor" href="#85-time--space-complexity">8.5 Time &#x26; Space Complexity</a></h2>
+<p><strong>Purpose</strong>: Make trade-offs explicit.</p>
+<h3 id="recursion-complexity"><a class="heading-anchor" href="#recursion-complexity">Recursion Complexity</a></h3>
+<div class="table-scroll">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Complexity</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Time</strong></td><td>O(branches^depth)</td><td>Exponential for backtracking</td></tr><tr><td><strong>Space</strong></td><td>O(depth)</td><td>Stack space for recursion depth</td></tr><tr><td><strong>Memoization Time</strong></td><td>O(unique_states)</td><td>Each state computed once</td></tr><tr><td><strong>Memoization Space</strong></td><td>O(unique_states)</td><td>Store all computed states</td></tr></tbody></table></div>
+<h3 id="backtracking-complexity"><a class="heading-anchor" href="#backtracking-complexity">Backtracking Complexity</a></h3>
+<div class="table-scroll">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Complexity</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Time</strong></td><td>O(branches^depth)</td><td>Worst case: explore all states</td></tr><tr><td><strong>Space</strong></td><td>O(depth)</td><td>Stack space + current state</td></tr><tr><td><strong>With Pruning</strong></td><td>O(valid_states)</td><td>Only explore valid states</td></tr><tr><td><strong>Memoization</strong></td><td>O(unique_states)</td><td>Cache computed states</td></tr></tbody></table></div>
+<h3 id="common-patterns"><a class="heading-anchor" href="#common-patterns">Common Patterns</a></h3>
+<p><strong>Linear Recursion</strong> (e.g., factorial):</p>
+<ul>
+<li>Time: O(n)</li>
+<li>Space: O(n) stack</li>
+</ul>
+<p><strong>Binary Recursion</strong> (e.g., binary tree traversal):</p>
+<ul>
+<li>Time: O(n)</li>
+<li>Space: O(h) where h is height</li>
+</ul>
+<p><strong>Exponential Backtracking</strong> (e.g., N-Queens):</p>
+<ul>
+<li>Time: O(branches^n) without pruning</li>
+<li>Space: O(n) for current state</li>
+</ul>
+<p><strong>Memoized Recursion</strong>:</p>
+<ul>
+<li>Time: O(unique_states × cost_per_state)</li>
+<li>Space: O(unique_states) + O(depth) stack</li>
+</ul>
+<h2 id="86-pseudocode-language-neutral--mandatory"><a class="heading-anchor" href="#86-pseudocode-language-neutral--mandatory">8.6 Pseudocode (Language-Neutral) ⭐ (Mandatory)</a></h2>
+<p><strong>Purpose</strong>: Bridge theory → implementation.</p>
+<p><strong>Rules</strong>: No language syntax, no pointers/templates, focus on logic only.</p>
+<h3 id="generic-recursive-pattern"><a class="heading-anchor" href="#generic-recursive-pattern">Generic Recursive Pattern</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>FUNCTION solve(problem):</span></span>
+<span class="line"><span>  IF isBaseCase(problem):</span></span>
+<span class="line"><span>    RETURN baseCaseSolution(problem)</span></span>
+<span class="line"><span>  END IF</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  subproblems ← decompose(problem)</span></span>
+<span class="line"><span>  solutions ← empty list</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  FOR EACH subproblem IN subproblems:</span></span>
+<span class="line"><span>    sub_solution ← solve(subproblem)</span></span>
+<span class="line"><span>    solutions.add(sub_solution)</span></span>
+<span class="line"><span>  END FOR</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  RETURN combine(solutions)</span></span>
+<span class="line"><span>END FUNCTION</span></span></code></pre>
+<h3 id="factorial-linear-recursion"><a class="heading-anchor" href="#factorial-linear-recursion">Factorial (Linear Recursion)</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>FUNCTION factorial(n):</span></span>
+<span class="line"><span>  IF n ≤ 1:</span></span>
+<span class="line"><span>    RETURN 1</span></span>
+<span class="line"><span>  END IF</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  RETURN n × factorial(n - 1)</span></span>
+<span class="line"><span>END FUNCTION</span></span></code></pre>
+<h3 id="binary-tree-traversal-binary-recursion"><a class="heading-anchor" href="#binary-tree-traversal-binary-recursion">Binary Tree Traversal (Binary Recursion)</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>FUNCTION inorderTraverse(node):</span></span>
+<span class="line"><span>  IF node is null:</span></span>
+<span class="line"><span>    RETURN</span></span>
+<span class="line"><span>  END IF</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  inorderTraverse(node.left)</span></span>
+<span class="line"><span>  process(node.data)</span></span>
+<span class="line"><span>  inorderTraverse(node.right)</span></span>
+<span class="line"><span>END FUNCTION</span></span></code></pre>
+<h3 id="backtracking-pattern"><a class="heading-anchor" href="#backtracking-pattern">Backtracking Pattern</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>FUNCTION backtrack(current_state):</span></span>
+<span class="line"><span>  IF isComplete(current_state):</span></span>
+<span class="line"><span>    IF isValid(current_state):</span></span>
+<span class="line"><span>      solutions.add(current_state)</span></span>
+<span class="line"><span>    END IF</span></span>
+<span class="line"><span>    RETURN</span></span>
+<span class="line"><span>  END IF</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  IF NOT isValid(current_state):</span></span>
+<span class="line"><span>    RETURN  // Prune invalid state</span></span>
+<span class="line"><span>  END IF</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  choices ← getPossibleChoices(current_state)</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  FOR EACH choice IN choices:</span></span>
+<span class="line"><span>    new_state ← extend(current_state, choice)</span></span>
+<span class="line"><span>    backtrack(new_state)</span></span>
+<span class="line"><span>    undo(current_state, choice)  // Backtrack</span></span>
+<span class="line"><span>  END FOR</span></span>
+<span class="line"><span>END FUNCTION</span></span></code></pre>
+<h3 id="n-queens-backtracking"><a class="heading-anchor" href="#n-queens-backtracking">N-Queens Backtracking</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>FUNCTION solveNQueens(board, row):</span></span>
+<span class="line"><span>  IF row = board_size:</span></span>
+<span class="line"><span>    IF isValidBoard(board):</span></span>
+<span class="line"><span>      solutions.add(copy(board))</span></span>
+<span class="line"><span>    END IF</span></span>
+<span class="line"><span>    RETURN</span></span>
+<span class="line"><span>  END IF</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  FOR col FROM 0 TO board_size - 1:</span></span>
+<span class="line"><span>    IF isValidPlacement(board, row, col):</span></span>
+<span class="line"><span>      board[row][col] ← QUEEN</span></span>
+<span class="line"><span>      solveNQueens(board, row + 1)</span></span>
+<span class="line"><span>      board[row][col] ← EMPTY  // Backtrack</span></span>
+<span class="line"><span>    END IF</span></span>
+<span class="line"><span>  END FOR</span></span>
+<span class="line"><span>END FUNCTION</span></span></code></pre>
+<h3 id="memoized-recursion"><a class="heading-anchor" href="#memoized-recursion">Memoized Recursion</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>FUNCTION solveMemoized(problem, memo):</span></span>
+<span class="line"><span>  IF problem in memo:</span></span>
+<span class="line"><span>    RETURN memo[problem]</span></span>
+<span class="line"><span>  END IF</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  IF isBaseCase(problem):</span></span>
+<span class="line"><span>    result ← baseCaseSolution(problem)</span></span>
+<span class="line"><span>  ELSE:</span></span>
+<span class="line"><span>    subproblems ← decompose(problem)</span></span>
+<span class="line"><span>    solutions ← empty list</span></span>
+<span class="line"><span>    </span></span>
+<span class="line"><span>    FOR EACH subproblem IN subproblems:</span></span>
+<span class="line"><span>      sub_solution ← solveMemoized(subproblem, memo)</span></span>
+<span class="line"><span>      solutions.add(sub_solution)</span></span>
+<span class="line"><span>    END FOR</span></span>
+<span class="line"><span>    </span></span>
+<span class="line"><span>    result ← combine(solutions)</span></span>
+<span class="line"><span>  END IF</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  memo[problem] ← result</span></span>
+<span class="line"><span>  RETURN result</span></span>
+<span class="line"><span>END FUNCTION</span></span></code></pre>
+<p>This pseudocode should be readable by any engineer, regardless of their programming language background.</p>
+<h2 id="87-implementation-reference-language-c-"><a class="heading-anchor" href="#87-implementation-reference-language-c-">8.7 Implementation (Reference Language: C++) ⭐</a></h2>
+<p><strong>Note to Reader</strong>: This section provides concrete C++ implementations. The correctness relies on the invariants defined in Section 8.3 and the pseudocode in Section 8.6.</p>
+<p>Detailed C++ implementations are provided in the following sections:</p>
+<ul>
+<li>Section 8.12: Common Recursion Problems (factorial, Fibonacci, etc.)</li>
+<li>Section 8.13: Classic Backtracking Problems (N-Queens, Sudoku, etc.)</li>
+</ul>
+<h2 id="88-correctness-argument"><a class="heading-anchor" href="#88-correctness-argument">8.8 Correctness Argument</a></h2>
+<p><strong>Purpose</strong>: Explain why the implementations work.</p>
+<h3 id="invariant-preservation"><a class="heading-anchor" href="#invariant-preservation">Invariant Preservation</a></h3>
+<p>Recursive and backtracking implementations preserve the core invariants:</p>
+<h4 id="1-termination-invariant"><a class="heading-anchor" href="#1-termination-invariant">1. Termination Invariant</a></h4>
+<p><strong>For Recursion</strong>:</p>
+<ul>
+<li>Base case check ensures termination</li>
+<li>Problem size decreases in recursive case</li>
+<li>Eventually reaches base case</li>
+<li><strong>Preserves</strong>: No infinite recursion</li>
+</ul>
+<p><strong>For Backtracking</strong>:</p>
+<ul>
+<li>Depth increases or backtrack occurs</li>
+<li>Eventually reaches complete state or exhausts choices</li>
+<li><strong>Preserves</strong>: Search terminates</li>
+</ul>
+<h4 id="2-correctness-invariant"><a class="heading-anchor" href="#2-correctness-invariant">2. Correctness Invariant</a></h4>
+<p><strong>For Recursion</strong>:</p>
+<ul>
+<li>Base cases return correct solutions</li>
+<li>Recursive cases combine correct subproblem solutions</li>
+<li><strong>Preserves</strong>: Final solution is correct</li>
+</ul>
+<p><strong>For Backtracking</strong>:</p>
+<ul>
+<li>Only valid complete states are added to solutions</li>
+<li>Invalid states are pruned</li>
+<li><strong>Preserves</strong>: All solutions are valid</li>
+</ul>
+<h4 id="3-completeness-invariant-backtracking"><a class="heading-anchor" href="#3-completeness-invariant-backtracking">3. Completeness Invariant (Backtracking)</a></h4>
+<p><strong>For Backtracking</strong>:</p>
+<ul>
+<li>All choices are tried at each step</li>
+<li>Backtracking ensures all paths are explored</li>
+<li>Pruning only removes invalid paths</li>
+<li><strong>Preserves</strong>: All valid solutions are found</li>
+</ul>
+<h3 id="informal-proof-sketch"><a class="heading-anchor" href="#informal-proof-sketch">Informal Proof Sketch</a></h3>
+<p><strong>For Recursion</strong>:</p>
+<ol>
+<li><strong>Base Case</strong>: Correct by definition/verification</li>
+<li><strong>Inductive Step</strong>: If subproblems solved correctly, combination is correct</li>
+<li><strong>Termination</strong>: Problem size decreases, eventually reaches base case</li>
+<li><strong>Conclusion</strong>: Recursive solution is correct</li>
+</ol>
+<p><strong>For Backtracking</strong>:</p>
+<ol>
+<li><strong>Systematic Exploration</strong>: All choices tried at each step</li>
+<li><strong>Constraint Checking</strong>: Invalid states pruned early</li>
+<li><strong>Backtracking</strong>: Ensures all paths explored</li>
+<li><strong>Conclusion</strong>: All valid solutions found</li>
+</ol>
+<p>This correctness argument provides engineers with confidence that recursive and backtracking implementations work correctly.</p>
+<h2 id="89-edge-cases--failure-modes"><a class="heading-anchor" href="#89-edge-cases--failure-modes">8.9 Edge Cases &#x26; Failure Modes</a></h2>
+<p><strong>Purpose</strong>: Build defensive thinking.</p>
+<h3 id="stack-overflow"><a class="heading-anchor" href="#stack-overflow">Stack Overflow</a></h3>
+<p><strong>Problem</strong>: Deep recursion exhausts stack space.</p>
+<p><strong>Edge Cases</strong>:</p>
+<ul>
+<li>Very deep recursion (10,000+ levels)</li>
+<li>Unbalanced recursion (one very deep branch)</li>
+<li>No base case (infinite recursion)</li>
+</ul>
+<p><strong>Handling</strong>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Use iterative approach for deep recursion</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Or increase stack size (system-dependent)</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Or use tail recursion optimization</span></span></code></pre>
+<p><strong>Failure Mode</strong>: Stack overflow crashes program.</p>
+<h3 id="missing-base-case"><a class="heading-anchor" href="#missing-base-case">Missing Base Case</a></h3>
+<p><strong>Problem</strong>: Recursion never terminates.</p>
+<p><strong>Edge Cases</strong>:</p>
+<ul>
+<li>No base case defined</li>
+<li>Base case condition never met</li>
+<li>Infinite recursion loop</li>
+</ul>
+<p><strong>Handling</strong>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Always define base case first</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Base case</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Ensure base case is reachable</span></span></code></pre>
+<p><strong>Failure Mode</strong>: Infinite recursion, stack overflow.</p>
+<h3 id="not-making-progress"><a class="heading-anchor" href="#not-making-progress">Not Making Progress</a></h3>
+<p><strong>Problem</strong>: Recursive call doesn’t reduce problem size.</p>
+<p><strong>Edge Cases</strong>:</p>
+<ul>
+<li>Same problem passed recursively</li>
+<li>Problem size doesn’t decrease</li>
+<li>Infinite loop in recursion</li>
+</ul>
+<p><strong>Handling</strong>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Ensure problem size decreases</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // n decreases</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Not: return solve(n);  // Same size!</span></span></code></pre>
+<h3 id="forgetting-to-backtrack"><a class="heading-anchor" href="#forgetting-to-backtrack">Forgetting to Backtrack</a></h3>
+<p><strong>Problem</strong>: State not restored after recursion.</p>
+<p><strong>Edge Cases</strong>:</p>
+<ul>
+<li>Modify state, recurse, but don’t undo</li>
+<li>State accumulates incorrect choices</li>
+<li>Solutions become corrupted</li>
+</ul>
+<p><strong>Handling</strong>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Always undo after recursion</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">makeChoice</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(choice);</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">backtrack</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(state);</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">undoChoice</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(choice);</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Must undo!</span></span></code></pre>
+<p><strong>Failure Mode</strong>: Incorrect solutions, state corruption.</p>
+<h3 id="common-failure-patterns"><a class="heading-anchor" href="#common-failure-patterns">Common Failure Patterns</a></h3>
+<ol>
+<li><strong>Missing Base Case</strong>: Infinite recursion</li>
+<li><strong>Not Making Progress</strong>: Same problem recursively</li>
+<li><strong>Forgetting Backtrack</strong>: State not restored</li>
+<li><strong>Stack Overflow</strong>: Too deep recursion</li>
+<li><strong>Off-by-One in Base Case</strong>: Wrong termination condition</li>
+</ol>
+<p>This section maps directly to production bugs and helps engineers write robust recursive code.</p>
+<h2 id="810-performance--system-considerations--differentiator"><a class="heading-anchor" href="#810-performance--system-considerations--differentiator">8.10 Performance &#x26; System Considerations ⭐ (Differentiator)</a></h2>
+<p><strong>Purpose</strong>: Connect algorithms to real machines.</p>
+<h3 id="stack-space"><a class="heading-anchor" href="#stack-space">Stack Space</a></h3>
+<h4 id="recursion-depth-limits"><a class="heading-anchor" href="#recursion-depth-limits">Recursion Depth Limits</a></h4>
+<p><strong>Problem</strong>: Each recursive call uses stack space.</p>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>Typical stack: 1-8 MB</li>
+<li>Each call: ~100-1000 bytes</li>
+<li>Deep recursion: Stack overflow risk</li>
+</ul>
+<p><strong>Mitigation</strong>:</p>
+<ul>
+<li>Use iterative approach for deep recursion</li>
+<li>Tail recursion optimization (compiler-dependent)</li>
+<li>Increase stack size (system-dependent)</li>
+</ul>
+<h3 id="function-call-overhead"><a class="heading-anchor" href="#function-call-overhead">Function Call Overhead</a></h3>
+<h4 id="call-stack-operations"><a class="heading-anchor" href="#call-stack-operations">Call Stack Operations</a></h4>
+<p><strong>Recursion Overhead</strong>:</p>
+<ul>
+<li>Function call: ~10-50 cycles</li>
+<li>Stack frame allocation: ~5-20 cycles</li>
+<li>Parameter passing: ~1-5 cycles per parameter</li>
+</ul>
+<p><strong>Iteration Overhead</strong>:</p>
+<ul>
+<li>Loop iteration: ~1-5 cycles</li>
+<li>No function call overhead</li>
+</ul>
+<p><strong>Performance Impact</strong>:</p>
+<ul>
+<li>Recursion: 10-100x more overhead per step</li>
+<li>Significant for performance-critical code</li>
+</ul>
+<h3 id="memory-access-patterns"><a class="heading-anchor" href="#memory-access-patterns">Memory Access Patterns</a></h3>
+<h4 id="stack-vs-heap"><a class="heading-anchor" href="#stack-vs-heap">Stack vs Heap</a></h4>
+<p><strong>Recursion</strong>:</p>
+<ul>
+<li>Uses call stack (limited, fast)</li>
+<li>Stack frames allocated/deallocated automatically</li>
+<li>Good cache locality (stack is contiguous)</li>
+</ul>
+<p><strong>Iteration with State</strong>:</p>
+<ul>
+<li>Uses heap for state (larger, slower)</li>
+<li>Manual memory management</li>
+<li>May have worse cache locality</li>
+</ul>
+<h3 id="tail-recursion-optimization"><a class="heading-anchor" href="#tail-recursion-optimization">Tail Recursion Optimization</a></h3>
+<h4 id="when-compiler-optimizes"><a class="heading-anchor" href="#when-compiler-optimizes">When Compiler Optimizes</a></h4>
+<p><strong>Tail Recursive</strong>:</p>
+<ul>
+<li>Recursive call is last operation</li>
+<li>No computation after call</li>
+<li>Can be optimized to iteration</li>
+</ul>
+<p><strong>Example</strong>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Tail recursive - can be optimized</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorialTail</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> acc</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> acc;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorialTail</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, n </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> acc);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Not tail recursive - cannot optimize</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Multiplication after call</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h3 id="backtracking-performance"><a class="heading-anchor" href="#backtracking-performance">Backtracking Performance</a></h3>
+<h4 id="pruning-effectiveness"><a class="heading-anchor" href="#pruning-effectiveness">Pruning Effectiveness</a></h4>
+<p><strong>Without Pruning</strong>:</p>
+<ul>
+<li>Explores all possible states</li>
+<li>Exponential time: O(branches^depth)</li>
+</ul>
+<p><strong>With Pruning</strong>:</p>
+<ul>
+<li>Skips invalid states early</li>
+<li>Reduces search space significantly</li>
+<li>Can make exponential → polynomial</li>
+</ul>
+<h4 id="memoization-trade-offs"><a class="heading-anchor" href="#memoization-trade-offs">Memoization Trade-offs</a></h4>
+<p><strong>Space vs Time</strong>:</p>
+<ul>
+<li>Memoization: O(states) space for O(1) lookup</li>
+<li>Without memo: O(1) space but recompute</li>
+</ul>
+<p><strong>When to Memoize</strong>:</p>
+<ul>
+<li>Overlapping subproblems</li>
+<li>Expensive computations</li>
+<li>Sufficient memory available</li>
+</ul>
+<h3 id="practical-recommendations"><a class="heading-anchor" href="#practical-recommendations">Practical Recommendations</a></h3>
+<ol>
+<li><strong>Use Iteration When Possible</strong>: Better performance, no stack risk</li>
+<li><strong>Use Recursion for Clarity</strong>: When code is much clearer</li>
+<li><strong>Consider Tail Recursion</strong>: Can be optimized by compiler</li>
+<li><strong>Prune Early</strong>: In backtracking, check constraints as soon as possible</li>
+<li><strong>Memoize Overlapping Subproblems</strong>: Trade space for time</li>
+<li><strong>Profile Before Optimizing</strong>: Measure actual performance</li>
+</ol>
+<p>This section connects recursion and backtracking to real system performance.</p>
+<h2 id="811-recursion-vs-iteration"><a class="heading-anchor" href="#811-recursion-vs-iteration">8.11 Recursion vs. Iteration</a></h2>
+<p>The factorial of n (n!) is defined as:</p>
+<ul>
+<li>Base case: 0! = 1, 1! = 1</li>
+<li>Recursive case: n! = n × (n-1)!</li>
+</ul>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;iostream></span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">using</span><span style="color:#D73A49;--shiki-dark:#F97583"> namespace</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> std</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Recursive factorial</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Recursive case</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Example usage</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> main</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "5! = "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Output: 120</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p><strong>Execution Trace for factorial(5)</strong>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>factorial(5)</span></span>
+<span class="line"><span>  → 5 * factorial(4)</span></span>
+<span class="line"><span>    → 4 * factorial(3)</span></span>
+<span class="line"><span>      → 3 * factorial(2)</span></span>
+<span class="line"><span>        → 2 * factorial(1)</span></span>
+<span class="line"><span>          → 1 (base case)</span></span>
+<span class="line"><span>        → 2 * 1 = 2</span></span>
+<span class="line"><span>      → 3 * 2 = 6</span></span>
+<span class="line"><span>    → 4 * 6 = 24</span></span>
+<span class="line"><span>  → 5 * 24 = 120</span></span></code></pre>
+<h3 id="visualizing-recursion-call-stack"><a class="heading-anchor" href="#visualizing-recursion-call-stack">Visualizing Recursion: Call Stack</a></h3>
+<div class="mermaid-wrap"><pre class="mermaid">graph TD
+    F5["factorial(5)"] --> F4["factorial(4)"]
+    F4 --> F3["factorial(3)"]
+    F3 --> F2["factorial(2)"]
+    F2 --> F1["factorial(1)"]
+    F1 -->|returns 1| F2
+    F2 -->|returns 2| F3
+    F3 -->|returns 6| F4
+    F4 -->|returns 24| F5
+    F5 -->|returns 120| Result["Result: 120"]
+    
+    style F1 fill:#90EE90,stroke:#333,stroke-width:2px
+    style Result fill:#FFE5B4,stroke:#333,stroke-width:3px</pre></div>
+<h3 id="common-recursion-patterns"><a class="heading-anchor" href="#common-recursion-patterns">Common Recursion Patterns</a></h3>
+<h4 id="1-linear-recursion"><a class="heading-anchor" href="#1-linear-recursion">1. Linear Recursion</a></h4>
+<p>Function makes a single recursive call.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Sum of array elements</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> sumArray</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[], </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Recursive case: sum of first n-1 + last element</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> sumArray</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h4 id="2-binary-recursion"><a class="heading-anchor" href="#2-binary-recursion">2. Binary Recursion</a></h4>
+<p>Function makes two recursive calls.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Binary search (recursive)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> binarySearch</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[], </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> left</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> right</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> target</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case: not found</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (left </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> right) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> left </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (right </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> left) </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case: found</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr[mid] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> target) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Recursive cases</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr[mid] </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> target) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> binarySearch</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, left, mid </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, target);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    } </span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> binarySearch</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, mid </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, right, target);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h4 id="3-multiple-recursion"><a class="heading-anchor" href="#3-multiple-recursion">3. Multiple Recursion</a></h4>
+<p>Function makes multiple recursive calls.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Fibonacci (multiple recursion)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> fibonacci</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base cases</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Multiple recursive calls</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> fibonacci</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> fibonacci</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h2 id="811-recursion-vs-iteration-1"><a class="heading-anchor" href="#811-recursion-vs-iteration-1">8.11 Recursion vs. Iteration</a></h2>
+<h3 id="when-to-use-recursion-1"><a class="heading-anchor" href="#when-to-use-recursion-1">When to Use Recursion</a></h3>
+<p><strong>Use Recursion When:</strong></p>
+<ul>
+<li>Problem has natural recursive structure (trees, graphs)</li>
+<li>Solution is clearer with recursion</li>
+<li>Divide and conquer approach fits</li>
+<li>Backtracking is needed</li>
+</ul>
+<p><strong>Use Iteration When:</strong></p>
+<ul>
+<li>Simple loops suffice</li>
+<li>Performance is critical (recursion has overhead)</li>
+<li>Stack overflow is a concern</li>
+<li>Tail recursion can be optimized</li>
+</ul>
+<h3 id="comparison"><a class="heading-anchor" href="#comparison">Comparison</a></h3>
+<div class="table-scroll">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Aspect</th><th>Recursion</th><th>Iteration</th></tr></thead><tbody><tr><td>Code Clarity</td><td>Often clearer for recursive problems</td><td>Can be more verbose</td></tr><tr><td>Performance</td><td>Function call overhead</td><td>No overhead</td></tr><tr><td>Memory</td><td>Uses call stack (O(n) depth)</td><td>Uses constant space</td></tr><tr><td>Stack Overflow</td><td>Risk for deep recursion</td><td>No risk</td></tr><tr><td>Debugging</td><td>Can be harder (call stack)</td><td>Easier to step through</td></tr></tbody></table></div>
+<h3 id="converting-recursion-to-iteration"><a class="heading-anchor" href="#converting-recursion-to-iteration">Converting Recursion to Iteration</a></h3>
+<p><strong>Example: Factorial</strong></p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Recursive version</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorialRecursive</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorialRecursive</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Iterative version</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorialIterative</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> result </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n; i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        result </span><span style="color:#D73A49;--shiki-dark:#F97583">*=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h2 id="812-tail-recursion"><a class="heading-anchor" href="#812-tail-recursion">8.12 Tail Recursion</a></h2>
+<p><strong>Tail recursion</strong> occurs when the recursive call is the last operation in the function. This allows the compiler to optimize it into iteration.</p>
+<h3 id="tail-recursive-factorial"><a class="heading-anchor" href="#tail-recursive-factorial">Tail Recursive Factorial</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Non-tail recursive (current operation after recursive call)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Multiplication after call</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Tail recursive (recursive call is last operation)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorialTail</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> accumulator</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> accumulator;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorialTail</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, n </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> accumulator);</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Call is last</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p><strong>Why Tail Recursion Matters:</strong></p>
+<ul>
+<li>Can be optimized to iteration (no stack growth)</li>
+<li>Prevents stack overflow</li>
+<li>Better performance</li>
+</ul>
+<h2 id="813-common-recursion-problems"><a class="heading-anchor" href="#813-common-recursion-problems">8.13 Common Recursion Problems</a></h2>
+<h3 id="problem-1-tower-of-hanoi"><a class="heading-anchor" href="#problem-1-tower-of-hanoi">Problem 1: Tower of Hanoi</a></h3>
+<p>Move n disks from source to destination using auxiliary rod.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> towerOfHanoi</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#E36209;--shiki-dark:#FFAB70"> source</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#E36209;--shiki-dark:#FFAB70"> destination</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#E36209;--shiki-dark:#FFAB70"> auxiliary</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Move disk 1 from "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> source </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> " to "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> destination </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Move n-1 disks from source to auxiliary</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    towerOfHanoi</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, source, auxiliary, destination);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Move largest disk from source to destination</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Move disk "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> " from "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> source </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> " to "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> destination </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Move n-1 disks from auxiliary to destination</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    towerOfHanoi</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, auxiliary, destination, source);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p><strong>Complexity</strong>: O(2^n) - exponential, but optimal solution</p>
+<h3 id="problem-2-power-function"><a class="heading-anchor" href="#problem-2-power-function">Problem 2: Power Function</a></h3>
+<p>Compute x^n efficiently.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Naive: O(n)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">double</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> powerNaive</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">double</span><span style="color:#E36209;--shiki-dark:#FFAB70"> x</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> powerNaive</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(x, n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Optimized: O(log n)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">double</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> powerOptimized</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">double</span><span style="color:#E36209;--shiki-dark:#FFAB70"> x</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    double</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> half </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> powerOptimized</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(x, n </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">%</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#D73A49;--shiki-dark:#F97583"> ==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> half </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> half;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    } </span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> half </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> half;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h3 id="problem-3-reverse-string"><a class="heading-anchor" href="#problem-3-reverse-string">Problem 3: Reverse String</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> reverseString</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">string</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> s</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> left</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> right</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (left </span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> right) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Swap characters</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    swap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(s[left], s[right]);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Recursive case</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    reverseString</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(s, left </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, right </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h2 id="814-introduction-to-backtracking"><a class="heading-anchor" href="#814-introduction-to-backtracking">8.14 Introduction to Backtracking</a></h2>
+<p><strong>Backtracking</strong> is an algorithmic technique for solving problems by trying partial solutions and abandoning them (“backtracking”) if they cannot lead to a valid solution.</p>
+<h3 id="key-characteristics-1"><a class="heading-anchor" href="#key-characteristics-1">Key Characteristics</a></h3>
+<ol>
+<li><strong>Incremental Construction</strong>: Build solution step by step</li>
+<li><strong>Constraint Checking</strong>: Verify if current path is valid</li>
+<li><strong>Backtracking</strong>: Undo choices that don’t lead to solution</li>
+<li><strong>Exploration</strong>: Try all possibilities systematically</li>
+</ol>
+<h3 id="backtracking-template"><a class="heading-anchor" href="#backtracking-template">Backtracking Template</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> backtrack</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">solution</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">choices</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case: solution is complete</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isComplete</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(solution)) {</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        processSolution</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(solution);</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Try each possible choice</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (each choice in choices) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Make choice</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        makeChoice</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(choice);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Check if valid (pruning)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isValid</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(solution)) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">            // Recurse</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">            backtrack</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(solution, remainingChoices);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Undo choice (backtrack)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        undoChoice</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(choice);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h2 id="815-classic-backtracking-problems"><a class="heading-anchor" href="#815-classic-backtracking-problems">8.15 Classic Backtracking Problems</a></h2>
+<h3 id="problem-1-n-queens-problem"><a class="heading-anchor" href="#problem-1-n-queens-problem">Problem 1: N-Queens Problem</a></h3>
+<p>Place N queens on an N×N chessboard such that no two queens attack each other.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;iostream></span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;vector></span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">using</span><span style="color:#D73A49;--shiki-dark:#F97583"> namespace</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> std</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> NQueens</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">private:</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int>></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> board;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> solutions;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> isValid</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> row</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> col</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Check column</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> row; i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (board[i][col] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Check upper-left diagonal</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> row </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> col </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x26;&#x26;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i</span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, j</span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (board[i][j] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Check upper-right diagonal</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> row </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> col </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x26;&#x26;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n; i</span><span style="color:#D73A49;--shiki-dark:#F97583">--</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (board[i][j] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> row</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Base case: all queens placed</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (row </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            solutions</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">            printBoard</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            return</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Try placing queen in each column of current row</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> col </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; col </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n; col</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isValid</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(row, col)) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                // Make choice</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                board[row][col] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                // Recurse</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">                solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(row </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                // Backtrack</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                board[row][col] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> printBoard</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Solution "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> solutions </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ":</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\n</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n; i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n; j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (board[i][j] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> ?</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Q "</span><span style="color:#D73A49;--shiki-dark:#F97583"> :</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ". "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">public:</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    NQueens</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) : </span><span style="color:#6F42C1;--shiki-dark:#B392F0">n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(size), </span><span style="color:#6F42C1;--shiki-dark:#B392F0">solutions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        board.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">assign</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>(n, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findSolutions</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Total solutions: "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> solutions </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span></code></pre>
+<h3 id="problem-2-sudoku-solver"><a class="heading-anchor" href="#problem-2-sudoku-solver">Problem 2: Sudoku Solver</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> SudokuSolver</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">private:</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;char>></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> board;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    static</span><span style="color:#D73A49;--shiki-dark:#F97583"> const</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> SIZE </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> isValid</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> row</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> col</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#E36209;--shiki-dark:#FFAB70"> num</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Check row</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> SIZE; j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (board[row][j] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Check column</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> SIZE; i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (board[i][col] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Check 3x3 box</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> boxRow </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (row </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> boxCol </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (col </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> boxRow; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> boxRow </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> boxCol; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> boxCol </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (board[i][j] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> SIZE; i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> SIZE; j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (board[i][j] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '.'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                    // Try each digit</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '1'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; num </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '9'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; num</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isValid</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(i, j, num)) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                            // Make choice</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                            board[i][j] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                            </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                            // Recurse</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                                return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                            </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">                            // Backtrack</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                            board[i][j] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '.'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                    }</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // No valid number found</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // All cells filled</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">public:</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> solveSudoku</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> board</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        this</span><span style="color:#24292E;--shiki-dark:#E1E4E8">->board </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> board;</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        board </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> this</span><span style="color:#24292E;--shiki-dark:#E1E4E8">->board;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span></code></pre>
+<h3 id="problem-3-generate-permutations"><a class="heading-anchor" href="#problem-3-generate-permutations">Problem 3: Generate Permutations</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> generatePermutations</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> nums</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> start</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> result</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case: permutation complete</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (start </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        result.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">push_back</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(nums);</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Try each element at current position</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> start; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Make choice: swap</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        swap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(nums[start], nums[i]);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Recurse</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        generatePermutations</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(nums, start </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, result);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Backtrack: undo swap</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        swap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(nums[start], nums[i]);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h3 id="problem-4-subset-generation"><a class="heading-anchor" href="#problem-4-subset-generation">Problem 4: Subset Generation</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> generateSubsets</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> nums</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> index</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> current</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">                    vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> result</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Base case: processed all elements</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (index </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        result.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">push_back</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(current);</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Choice 1: Include current element</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    current.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">push_back</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(nums[index]);</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    generateSubsets</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(nums, index </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, current, result);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    current.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">pop_back</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Backtrack</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Choice 2: Exclude current element</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    generateSubsets</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(nums, index </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, current, result);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h2 id="816-backtracking-with-memoization"><a class="heading-anchor" href="#816-backtracking-with-memoization">8.16 Backtracking with Memoization</a></h2>
+<p>Backtracking can be combined with memoization to avoid redundant computations.</p>
+<h3 id="example-word-break-problem"><a class="heading-anchor" href="#example-word-break-problem">Example: Word Break Problem</a></h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> WordBreak</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">private:</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    unordered_set</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">string</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> wordDict;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    unordered_map</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">string, </span><span style="color:#D73A49;--shiki-dark:#F97583">bool></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> memo;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> canBreak</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">string</span><span style="color:#E36209;--shiki-dark:#FFAB70"> s</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Base case</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (s.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">empty</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Check memo</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (memo.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">find</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(s) </span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> memo.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> memo[s];</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">        // Try each possible prefix</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> s.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">length</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            string prefix </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> s.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">substr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, i);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (wordDict.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">find</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(prefix) </span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> wordDict.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                string suffix </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> s.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">substr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(i);</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">canBreak</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(suffix)) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                    memo[s] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">                }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        memo[s] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">public:</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> wordBreak</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">string</span><span style="color:#E36209;--shiki-dark:#FFAB70"> s</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">string</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> wordDict</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        this</span><span style="color:#24292E;--shiki-dark:#E1E4E8">->wordDict </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> unordered_set</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">string</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>(wordDict.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), wordDict.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> canBreak</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(s);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span></code></pre>
+<h2 id="817-optimization-techniques"><a class="heading-anchor" href="#817-optimization-techniques">8.17 Optimization Techniques</a></h2>
+<h3 id="pruning"><a class="heading-anchor" href="#pruning">Pruning</a></h3>
+<p><strong>Pruning</strong> is the technique of eliminating branches that cannot lead to a solution.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Example: Early termination in N-Queens</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> row</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (row </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> col </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; col </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n; col</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">isValid</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(row, col)) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            board[row][col] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            </span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">            // Pruning: if this leads to solution, return immediately</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(row </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            </span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            board[row][col] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h3 id="constraint-propagation"><a class="heading-anchor" href="#constraint-propagation">Constraint Propagation</a></h3>
+<p>Use constraints to reduce search space early.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Example: Sudoku with constraint propagation</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Find cell with fewest possibilities</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    pair</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> cell </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findMostConstrainedCell</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (cell.first </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Solved</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;char></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> possibilities </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> getPossibilities</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(cell.first, cell.second);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">char</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num : possibilities) {</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        board[cell.first][cell.second] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">solve</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        board[cell.first][cell.second] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '.'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<h2 id="818-common-pitfalls-and-best-practices"><a class="heading-anchor" href="#818-common-pitfalls-and-best-practices">8.18 Common Pitfalls and Best Practices</a></h2>
+<h3 id="common-pitfalls"><a class="heading-anchor" href="#common-pitfalls">Common Pitfalls</a></h3>
+<ol>
+<li>
+<p><strong>Missing Base Case</strong>: Infinite recursion</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// WRONG: No base case</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+</li>
+<li>
+<p><strong>Not Making Progress</strong>: Infinite recursion</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// WRONG: Doesn't move toward base case</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> badRecursion</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> badRecursion</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n);</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Same value!</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+</li>
+<li>
+<p><strong>Forgetting to Backtrack</strong>: Incorrect solutions</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// WRONG: Doesn't undo choice</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> backtrack</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(...) {</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    makeChoice</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(choice);</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    backtrack</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(...);</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Missing: undoChoice(choice);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+</li>
+<li>
+<p><strong>Stack Overflow</strong>: Deep recursion</p>
+<ul>
+<li>Solution: Use iteration or tail recursion</li>
+<li>Consider iterative DFS for deep trees</li>
+</ul>
+</li>
+</ol>
+<h3 id="best-practices"><a class="heading-anchor" href="#best-practices">Best Practices</a></h3>
+<ol>
+<li><strong>Always Define Base Case First</strong></li>
+<li><strong>Ensure Progress Toward Base Case</strong></li>
+<li><strong>Use Memoization When Appropriate</strong></li>
+<li><strong>Prune Early When Possible</strong></li>
+<li><strong>Test with Small Inputs First</strong></li>
+<li><strong>Consider Stack Depth Limits</strong></li>
+</ol>
+<h2 id="819-key-takeaways"><a class="heading-anchor" href="#819-key-takeaways">8.19 Key Takeaways</a></h2>
+<ol>
+<li><strong>Recursion</strong> breaks problems into smaller subproblems</li>
+<li><strong>Base case</strong> stops recursion</li>
+<li><strong>Backtracking</strong> explores all solutions systematically</li>
+<li><strong>Memoization</strong> can optimize recursive solutions</li>
+<li><strong>Pruning</strong> reduces search space</li>
+<li><strong>Tail recursion</strong> can be optimized to iteration</li>
+</ol>
+<h2 id="820-exercises"><a class="heading-anchor" href="#820-exercises">8.20 Exercises</a></h2>
+<ol>
+<li><strong>Easy</strong>: Implement recursive binary search</li>
+<li><strong>Easy</strong>: Write recursive function to reverse a linked list</li>
+<li><strong>Medium</strong>: Solve Tower of Hanoi for n disks</li>
+<li><strong>Medium</strong>: Generate all permutations of an array</li>
+<li><strong>Medium</strong>: Solve N-Queens problem for N=8</li>
+<li><strong>Hard</strong>: Implement Sudoku solver</li>
+<li><strong>Hard</strong>: Word Break II (return all possible sentences)</li>
+</ol>
+<h2 id="821-summary"><a class="heading-anchor" href="#821-summary">8.21 Summary</a></h2>
+<p>Recursion and backtracking are fundamental techniques for solving complex problems. Recursion provides an elegant way to express solutions to problems with recursive structure, while backtracking systematically explores solution spaces. Understanding these techniques is essential for tree/graph algorithms, dynamic programming, and many interview problems.</p>
+<p><strong>Next Steps:</strong></p>
+<ul>
+<li>Apply recursion to tree traversal (Chapter 6)</li>
+<li>Use backtracking in dynamic programming (Chapter 12)</li>
+<li>Explore divide and conquer algorithms (Chapter 17)</li>
+</ul>
+<p><strong>Related Chapters:</strong></p>
+<ul>
+<li>Chapter 6: Trees (recursive traversal)</li>
+<li>Chapter 11: Graphs (DFS uses recursion)</li>
+<li>Chapter 12: Dynamic Programming (memoization)</li>
+<li>Chapter 17: Divide and Conquer (recursive structure)</li>
+</ul></div><nav class="mt-20 grid gap-3 sm:grid-cols-2"><a href="/chapters/string-search-algorithms" class="rounded-xl border p-4 no-underline transition-colors hover:bg-[var(--surface-2)]" style="border-color: var(--border)"><div class="text-xs" style="color: var(--text-muted)">← Chapter 7</div><div class="mt-1 text-sm font-semibold" style="color: var(--text-primary)">String Search Algorithms</div></a><a href="/chapters/sorting-algorithms" class="rounded-xl border p-4 text-right no-underline transition-colors hover:bg-[var(--surface-2)] sm:col-start-2" style="border-color: var(--border)"><div class="text-xs" style="color: var(--text-muted)">Chapter 9 →</div><div class="mt-1 text-sm font-semibold" style="color: var(--text-primary)">Sorting Algorithms</div></a></nav><div class="mt-14"></div></article><aside class="hidden lg:block"><div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"><div class="mb-3 text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">On this page</div><ul class="space-y-1.5 text-sm"><li style="padding-left: 0rem"><a href="#81-problem-statement--motivation" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.1 Problem Statement &amp; Motivation</a></li><li style="padding-left: 0.75rem"><a href="#what-problem-do-recursion-and-backtracking-solve" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">What Problem Do Recursion and Backtracking Solve?</a></li><li style="padding-left: 0.75rem"><a href="#when-to-use-recursion" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">When to Use Recursion</a></li><li style="padding-left: 0.75rem"><a href="#when-not-to-use-recursion" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">When NOT to Use Recursion</a></li><li style="padding-left: 0rem"><a href="#82-conceptual-overview" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.2 Conceptual Overview</a></li><li style="padding-left: 0.75rem"><a href="#intuitive-explanation" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Intuitive Explanation</a></li><li style="padding-left: 0.75rem"><a href="#key-characteristics" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Key Characteristics</a></li><li style="padding-left: 0.75rem"><a href="#the-recursive-thinking-pattern" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">The Recursive Thinking Pattern</a></li><li style="padding-left: 0.75rem"><a href="#the-backtracking-pattern" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">The Backtracking Pattern</a></li><li style="padding-left: 0rem"><a href="#83-abstract-model--invariants--mandatory" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.3 Abstract Model &amp; Invariants ⭐ (Mandatory)</a></li><li style="padding-left: 0.75rem"><a href="#abstract-model" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Abstract Model</a></li><li style="padding-left: 0.75rem"><a href="#core-invariants" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Core Invariants</a></li><li style="padding-left: 0.75rem"><a href="#assumptions" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Assumptions</a></li><li style="padding-left: 0rem"><a href="#84-operations--interface" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.4 Operations &amp; Interface</a></li><li style="padding-left: 0.75rem"><a href="#behavioral-guarantees" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Behavioral Guarantees</a></li><li style="padding-left: 0rem"><a href="#85-time--space-complexity" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.5 Time &amp; Space Complexity</a></li><li style="padding-left: 0.75rem"><a href="#recursion-complexity" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Recursion Complexity</a></li><li style="padding-left: 0.75rem"><a href="#backtracking-complexity" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Backtracking Complexity</a></li><li style="padding-left: 0.75rem"><a href="#common-patterns" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Common Patterns</a></li><li style="padding-left: 0rem"><a href="#86-pseudocode-language-neutral--mandatory" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.6 Pseudocode (Language-Neutral) ⭐ (Mandatory)</a></li><li style="padding-left: 0.75rem"><a href="#generic-recursive-pattern" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Generic Recursive Pattern</a></li><li style="padding-left: 0.75rem"><a href="#factorial-linear-recursion" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Factorial (Linear Recursion)</a></li><li style="padding-left: 0.75rem"><a href="#binary-tree-traversal-binary-recursion" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Binary Tree Traversal (Binary Recursion)</a></li><li style="padding-left: 0.75rem"><a href="#backtracking-pattern" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Backtracking Pattern</a></li><li style="padding-left: 0.75rem"><a href="#n-queens-backtracking" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">N-Queens Backtracking</a></li><li style="padding-left: 0.75rem"><a href="#memoized-recursion" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Memoized Recursion</a></li><li style="padding-left: 0rem"><a href="#87-implementation-reference-language-c-" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.7 Implementation (Reference Language: C++) ⭐</a></li><li style="padding-left: 0rem"><a href="#88-correctness-argument" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.8 Correctness Argument</a></li><li style="padding-left: 0.75rem"><a href="#invariant-preservation" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Invariant Preservation</a></li><li style="padding-left: 0.75rem"><a href="#informal-proof-sketch" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Informal Proof Sketch</a></li><li style="padding-left: 0rem"><a href="#89-edge-cases--failure-modes" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.9 Edge Cases &amp; Failure Modes</a></li><li style="padding-left: 0.75rem"><a href="#stack-overflow" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Stack Overflow</a></li><li style="padding-left: 0.75rem"><a href="#missing-base-case" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Missing Base Case</a></li><li style="padding-left: 0.75rem"><a href="#not-making-progress" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Not Making Progress</a></li><li style="padding-left: 0.75rem"><a href="#forgetting-to-backtrack" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Forgetting to Backtrack</a></li><li style="padding-left: 0.75rem"><a href="#common-failure-patterns" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Common Failure Patterns</a></li><li style="padding-left: 0rem"><a href="#810-performance--system-considerations--differentiator" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.10 Performance &amp; System Considerations ⭐ (Differentiator)</a></li><li style="padding-left: 0.75rem"><a href="#stack-space" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Stack Space</a></li><li style="padding-left: 0.75rem"><a href="#function-call-overhead" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Function Call Overhead</a></li><li style="padding-left: 0.75rem"><a href="#memory-access-patterns" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Memory Access Patterns</a></li><li style="padding-left: 0.75rem"><a href="#tail-recursion-optimization" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Tail Recursion Optimization</a></li><li style="padding-left: 0.75rem"><a href="#backtracking-performance" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Backtracking Performance</a></li><li style="padding-left: 0.75rem"><a href="#practical-recommendations" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Practical Recommendations</a></li><li style="padding-left: 0rem"><a href="#811-recursion-vs-iteration" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.11 Recursion vs. Iteration</a></li><li style="padding-left: 0.75rem"><a href="#visualizing-recursion-call-stack" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Visualizing Recursion: Call Stack</a></li><li style="padding-left: 0.75rem"><a href="#common-recursion-patterns" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Common Recursion Patterns</a></li><li style="padding-left: 0rem"><a href="#811-recursion-vs-iteration-1" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.11 Recursion vs. Iteration</a></li><li style="padding-left: 0.75rem"><a href="#when-to-use-recursion-1" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">When to Use Recursion</a></li><li style="padding-left: 0.75rem"><a href="#comparison" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Comparison</a></li><li style="padding-left: 0.75rem"><a href="#converting-recursion-to-iteration" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Converting Recursion to Iteration</a></li><li style="padding-left: 0rem"><a href="#812-tail-recursion" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.12 Tail Recursion</a></li><li style="padding-left: 0.75rem"><a href="#tail-recursive-factorial" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Tail Recursive Factorial</a></li><li style="padding-left: 0rem"><a href="#813-common-recursion-problems" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.13 Common Recursion Problems</a></li><li style="padding-left: 0.75rem"><a href="#problem-1-tower-of-hanoi" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Problem 1: Tower of Hanoi</a></li><li style="padding-left: 0.75rem"><a href="#problem-2-power-function" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Problem 2: Power Function</a></li><li style="padding-left: 0.75rem"><a href="#problem-3-reverse-string" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Problem 3: Reverse String</a></li><li style="padding-left: 0rem"><a href="#814-introduction-to-backtracking" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.14 Introduction to Backtracking</a></li><li style="padding-left: 0.75rem"><a href="#key-characteristics-1" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Key Characteristics</a></li><li style="padding-left: 0.75rem"><a href="#backtracking-template" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Backtracking Template</a></li><li style="padding-left: 0rem"><a href="#815-classic-backtracking-problems" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.15 Classic Backtracking Problems</a></li><li style="padding-left: 0.75rem"><a href="#problem-1-n-queens-problem" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Problem 1: N-Queens Problem</a></li><li style="padding-left: 0.75rem"><a href="#problem-2-sudoku-solver" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Problem 2: Sudoku Solver</a></li><li style="padding-left: 0.75rem"><a href="#problem-3-generate-permutations" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Problem 3: Generate Permutations</a></li><li style="padding-left: 0.75rem"><a href="#problem-4-subset-generation" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Problem 4: Subset Generation</a></li><li style="padding-left: 0rem"><a href="#816-backtracking-with-memoization" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.16 Backtracking with Memoization</a></li><li style="padding-left: 0.75rem"><a href="#example-word-break-problem" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Example: Word Break Problem</a></li><li style="padding-left: 0rem"><a href="#817-optimization-techniques" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.17 Optimization Techniques</a></li><li style="padding-left: 0.75rem"><a href="#pruning" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Pruning</a></li><li style="padding-left: 0.75rem"><a href="#constraint-propagation" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Constraint Propagation</a></li><li style="padding-left: 0rem"><a href="#818-common-pitfalls-and-best-practices" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.18 Common Pitfalls and Best Practices</a></li><li style="padding-left: 0.75rem"><a href="#common-pitfalls" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Common Pitfalls</a></li><li style="padding-left: 0.75rem"><a href="#best-practices" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Best Practices</a></li><li style="padding-left: 0rem"><a href="#819-key-takeaways" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.19 Key Takeaways</a></li><li style="padding-left: 0rem"><a href="#820-exercises" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.20 Exercises</a></li><li style="padding-left: 0rem"><a href="#821-summary" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">8.21 Summary</a></li></ul></div></aside></div></main><footer class="mt-24 border-t" style="border-color: var(--border)"><div class="mx-auto max-w-6xl px-5 py-10 text-sm" style="color: var(--text-muted)"><p>A free, open-source book. MIT licensed —<a href="https://github.com/sb2k16/data-structures-book" class="underline" style="color: var(--text-secondary)" rel="noopener">read it, fork it, teach from it</a>.</p><p class="mt-1.5">Every benchmark on this site runs in your browser. Nothing is uploaded, and no result leaves the tab.</p></div></footer><script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.rNgEMDoa.js"></script></body></html>
