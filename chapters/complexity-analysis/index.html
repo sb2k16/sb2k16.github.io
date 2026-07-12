@@ -1,812 +1,298 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Time and Space Complexity Analysis — Data Structures on Real Hardware</title><meta name="description" content="Big-O, and the far more interesting question of when Big-O stops predicting anything."><link rel="canonical" href="https://sb2k16.github.io/chapters/complexity-analysis/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="sitemap" href="/sitemap-index.xml"><meta property="og:type" content="article"><meta property="og:title" content="Time and Space Complexity Analysis"><meta property="og:description" content="Big-O, and the far more interesting question of when Big-O stops predicting anything."><meta property="og:url" content="https://sb2k16.github.io/chapters/complexity-analysis/"><meta property="og:image" content="https://sb2k16.github.io/og-default.png"><meta property="og:site_name" content="Data Structures on Real Hardware"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Time and Space Complexity Analysis"><meta name="twitter:description" content="Big-O, and the far more interesting question of when Big-O stops predicting anything."><meta name="twitter:image" content="https://sb2k16.github.io/og-default.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Time and Space Complexity Analysis","headline":"Time and Space Complexity Analysis","description":"Big-O, and the far more interesting question of when Big-O stops predicting anything.","url":"https://sb2k16.github.io/chapters/complexity-analysis/","author":{"@type":"Person","name":"Souvik Bhattacherjee"}}</script><script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Time and Space Complexity Analysis — Data Structures on Systems</title><meta name="description" content="Big-O, and the two things it deliberately hides — the constant factor and the memory hierarchy — that decide which O(n) algorithm actually wins. With benchmarks you run on your own machine."><link rel="canonical" href="https://sb2k16.github.io/chapters/complexity-analysis/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="sitemap" href="/sitemap-index.xml"><meta property="og:type" content="article"><meta property="og:title" content="Time and Space Complexity Analysis"><meta property="og:description" content="Big-O, and the two things it deliberately hides — the constant factor and the memory hierarchy — that decide which O(n) algorithm actually wins. With benchmarks you run on your own machine."><meta property="og:url" content="https://sb2k16.github.io/chapters/complexity-analysis/"><meta property="og:image" content="https://sb2k16.github.io/og-default.png"><meta property="og:site_name" content="Data Structures on Systems"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Time and Space Complexity Analysis"><meta name="twitter:description" content="Big-O, and the two things it deliberately hides — the constant factor and the memory hierarchy — that decide which O(n) algorithm actually wins. With benchmarks you run on your own machine."><meta name="twitter:image" content="https://sb2k16.github.io/og-default.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Time and Space Complexity Analysis","headline":"Time and Space Complexity Analysis","description":"Big-O, and the two things it deliberately hides — the constant factor and the memory hierarchy — that decide which O(n) algorithm actually wins. With benchmarks you run on your own machine.","url":"https://sb2k16.github.io/chapters/complexity-analysis/","author":{"@type":"Person","name":"Souvik Bhattacherjee"}}</script><script>
       const stored = localStorage.getItem('theme');
       if (stored === 'dark' || stored === 'light') {
         document.documentElement.dataset.theme = stored;
       }
-    </script><link rel="stylesheet" href="/_astro/Base.CoKL3ywM.css"></head><body><a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:px-3 focus:py-2" style="background: var(--surface-1); color: var(--text-primary)">Skip to content</a><header class="sticky top-0 z-40 border-b backdrop-blur" style="border-color: var(--border); background: color-mix(in srgb, var(--surface-1) 88%, transparent)"><nav class="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5"><a href="/" class="flex items-center gap-2 text-sm font-semibold no-underline" style="color: var(--text-primary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="8" width="20" height="8" rx="1.5" stroke="var(--accent)" stroke-width="1.8"></rect><path d="M7 8v8M12 8v8M17 8v8" stroke="var(--accent)" stroke-width="1.8"></path></svg>Real Hardware</a><div class="ml-auto flex items-center gap-1 text-sm"><a href="/chapters" class="rounded-md px-2.5 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:px-3" style="color: var(--text-secondary)">Chapters</a><a href="/chapters/memory-hierarchy" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)">Benchmarks</a><a href="https://github.com/sb2k16/data-structures-book" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)" rel="noopener">GitHub</a><button id="theme-toggle" type="button" aria-label="Toggle color theme" class="rounded-md p-2 transition-colors" data-astro-cid-l6lhmie6><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" class="sun-core" data-astro-cid-l6lhmie6></circle><g class="sun-rays" data-astro-cid-l6lhmie6><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-l6lhmie6></path></g><path class="moon" d="M20 14.5A8 8 0 019.5 4 8.5 8.5 0 1020 14.5z" fill="currentColor" stroke="none" data-astro-cid-l6lhmie6></path></svg></button><script type="module">var e=document.documentElement;document.getElementById(`theme-toggle`)?.addEventListener(`click`,()=>{let t=(e.dataset.theme??(matchMedia(`(prefers-color-scheme: dark)`).matches?`dark`:`light`))===`dark`?`light`:`dark`;e.dataset.theme=t,localStorage.setItem(`theme`,t)});</script></div></nav></header><main id="main"><div class="mx-auto max-w-6xl px-5 py-12 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12"><article class="min-w-0"><header class="mb-10"><div class="text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">Chapter 2 · Foundations</div><h1 class="mt-2 text-3xl font-bold leading-tight tracking-tight sm:text-4xl" style="color: var(--text-primary)">Time and Space Complexity Analysis</h1><p class="mt-3 max-w-2xl text-base leading-relaxed" style="color: var(--text-secondary)">Big-O, and the far more interesting question of when Big-O stops predicting anything.</p></header><div class="prose"><h2 id="21-introduction-to-complexity-analysis"><a class="heading-anchor" href="#21-introduction-to-complexity-analysis">2.1 Introduction to Complexity Analysis</a></h2>
-<p>Complexity analysis is the process of determining how the resource requirements (time and space) of an algorithm scale with the input size. This helps us:</p>
+    </script><link rel="stylesheet" href="/_astro/Base.DENnS0ax.css"></head><body><a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:px-3 focus:py-2" style="background: var(--surface-1); color: var(--text-primary)">Skip to content</a><header class="sticky top-0 z-40 border-b backdrop-blur" style="border-color: var(--border); background: color-mix(in srgb, var(--surface-1) 88%, transparent)"><nav class="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5"><a href="/" class="flex items-center gap-2 text-sm font-semibold no-underline" style="color: var(--text-primary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="8" width="20" height="8" rx="1.5" stroke="var(--accent)" stroke-width="1.8"></rect><path d="M7 8v8M12 8v8M17 8v8" stroke="var(--accent)" stroke-width="1.8"></path></svg><span class="hidden sm:inline">Data Structures on Systems</span><span class="sm:hidden">Data Structures</span></a><div class="ml-auto flex items-center gap-1 text-sm"><a href="/chapters" class="rounded-md px-2.5 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:px-3" style="color: var(--text-secondary)">Chapters</a><a href="/chapters/memory-hierarchy" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)">Benchmarks</a><a href="https://github.com/sb2k16/data-structures-book" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)" rel="noopener">GitHub</a><button id="theme-toggle" type="button" aria-label="Toggle color theme" class="rounded-md p-2 transition-colors" data-astro-cid-l6lhmie6><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" class="sun-core" data-astro-cid-l6lhmie6></circle><g class="sun-rays" data-astro-cid-l6lhmie6><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-l6lhmie6></path></g><path class="moon" d="M20 14.5A8 8 0 019.5 4 8.5 8.5 0 1020 14.5z" fill="currentColor" stroke="none" data-astro-cid-l6lhmie6></path></svg></button><script type="module">var e=document.documentElement;document.getElementById(`theme-toggle`)?.addEventListener(`click`,()=>{let t=(e.dataset.theme??(matchMedia(`(prefers-color-scheme: dark)`).matches?`dark`:`light`))===`dark`?`light`:`dark`;e.dataset.theme=t,localStorage.setItem(`theme`,t)});</script></div></nav></header><main id="main"><div class="mx-auto max-w-6xl px-5 py-12 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12"><article class="min-w-0"><header class="mb-10"><div class="text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">Chapter 2 · Foundations</div><h1 class="mt-2 text-3xl font-bold leading-tight tracking-tight sm:text-4xl" style="color: var(--text-primary)">Time and Space Complexity Analysis</h1><p class="mt-3 max-w-2xl text-base leading-relaxed" style="color: var(--text-secondary)">Big-O, and the two things it hides — the constant factor and the memory hierarchy — that decide which O(n) actually wins. Measured live.</p></header><div class="prose"><p>Complexity analysis answers one question: as the input grows, how does the cost grow with
+it? That question matters enormously, and Big-O notation is the right tool for it. But Big-O
+was designed to throw away two things — the constant factor and the cost of touching
+memory — and on real hardware those two things routinely decide which algorithm wins. This
+chapter teaches Big-O, and then teaches exactly what it hides, because you need both to make
+good decisions.</p>
+<h2 id="big-o-in-one-page"><a class="heading-anchor" href="#big-o-in-one-page">Big-O in one page</a></h2>
+<p>Big-O describes the <strong>growth rate</strong> of an algorithm’s cost as the input size <code>n</code> grows,
+ignoring constant factors and lower-order terms. Formally, <code>f(n) = O(g(n))</code> if <code>f(n) ≤ c·g(n)</code>
+for some constant <code>c</code> and all <code>n</code> past some threshold. Informally: <em>what does the cost curve
+look like as <code>n</code> heads toward infinity?</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-scroll"><table><thead><tr><th>Notation</th><th>Name</th><th>Example operation</th></tr></thead><tbody><tr><td>O(1)</td><td>Constant</td><td>Array index, hash lookup (average)</td></tr><tr><td>O(log n)</td><td>Logarithmic</td><td>Binary search, balanced-tree lookup</td></tr><tr><td>O(n)</td><td>Linear</td><td>Scanning an array</td></tr><tr><td>O(n log n)</td><td>Linearithmic</td><td>Merge sort, heap sort, <code>std::sort</code></td></tr><tr><td>O(n²)</td><td>Quadratic</td><td>Nested loop over all pairs</td></tr><tr><td>O(2ⁿ)</td><td>Exponential</td><td>Generating every subset</td></tr></tbody></table></div>
+<p>The distances between these rows are staggering. At <code>n = 1,000,000</code>, a log n algorithm does
+about 20 units of work, a linear one does a million, and a quadratic one does a trillion —
+the difference between instant and <em>next week</em>. That is why growth rate is the first thing to
+reason about, and why the rest of this book cares about it.</p>
+<p>The mechanics are worth knowing and quick to state:</p>
 <ul>
-<li>Compare different algorithms for the same problem</li>
-<li>Predict performance on large inputs</li>
-<li>Choose the most appropriate algorithm for our constraints</li>
-<li>Optimize code when performance is critical</li>
+<li><strong>Drop constants.</strong> <code>O(2n)</code> is <code>O(n)</code>. Big-O is about shape, not scale.</li>
+<li><strong>Drop lower-order terms.</strong> <code>O(n² + n)</code> is <code>O(n²)</code>. The fastest-growing term wins as <code>n → ∞</code>.</li>
+<li><strong>Sequential work adds; nested work multiplies.</strong> Two loops one after another are <code>O(a + b)</code>;
+one loop inside another is <code>O(a × b)</code>.</li>
 </ul>
-<h2 id="22-big-o-notation"><a class="heading-anchor" href="#22-big-o-notation">2.2 Big O Notation</a></h2>
-<p>Big O notation describes the upper bound of an algorithm’s growth rate. It tells us how an algorithm’s performance scales as the input size increases.</p>
-<h3 id="mathematical-definition"><a class="heading-anchor" href="#mathematical-definition">Mathematical Definition</a></h3>
-<p>For functions f(n) and g(n), we say f(n) = O(g(n)) if there exist positive constants c and n₀ such that:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>f(n) ≤ c × g(n) for all n ≥ n₀</span></span></code></pre>
-<h3 id="common-big-o-notations-from-best-to-worst"><a class="heading-anchor" href="#common-big-o-notations-from-best-to-worst">Common Big O Notations (from best to worst)</a></h3>
-<div class="table-scroll">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th>Notation</th><th>Name</th><th>Description</th><th>Example</th></tr></thead><tbody><tr><td>O(1)</td><td>Constant</td><td>Time/space doesn’t change with input</td><td>Array access by index</td></tr><tr><td>O(log n)</td><td>Logarithmic</td><td>Time/space grows logarithmically</td><td>Binary search</td></tr><tr><td>O(n)</td><td>Linear</td><td>Time/space grows linearly</td><td>Linear search</td></tr><tr><td>O(n log n)</td><td>Linearithmic</td><td>Time/space grows as n times log n</td><td>Merge sort</td></tr><tr><td>O(n²)</td><td>Quadratic</td><td>Time/space grows quadratically</td><td>Bubble sort</td></tr><tr><td>O(n³)</td><td>Cubic</td><td>Time/space grows cubically</td><td>Matrix multiplication</td></tr><tr><td>O(2ⁿ)</td><td>Exponential</td><td>Time/space grows exponentially</td><td>Brute force subset generation</td></tr><tr><td>O(n!)</td><td>Factorial</td><td>Time/space grows factorially</td><td>Permutation generation</td></tr></tbody></table></div>
-<h3 id="visual-representation-of-growth-rates"><a class="heading-anchor" href="#visual-representation-of-growth-rates">Visual Representation of Growth Rates</a></h3>
-<div class="mermaid-wrap"><pre class="mermaid">graph LR
-    subgraph Complexity["Complexity Growth Comparison"]
-        O1["O(1)&#x3C;br/>Constant"]
-        OLogN["O(log n)&#x3C;br/>Logarithmic"]
-        ON["O(n)&#x3C;br/>Linear"]
-        ONLogN["O(n log n)&#x3C;br/>Linearithmic"]
-        ON2["O(n²)&#x3C;br/>Quadratic"]
-        O2N["O(2ⁿ)&#x3C;br/>Exponential"]
-    end
-    
-    style O1 fill:#90EE90,stroke:#333,stroke-width:2px
-    style OLogN fill:#87CEEB,stroke:#333,stroke-width:2px
-    style ON fill:#FFE5B4,stroke:#333,stroke-width:2px
-    style ONLogN fill:#FFA500,stroke:#333,stroke-width:2px
-    style ON2 fill:#FF6347,stroke:#333,stroke-width:2px
-    style O2N fill:#DC143C,stroke:#333,stroke-width:3px</pre></div>
-<p><strong>Growth Rate Comparison Table</strong>:</p>
-<div class="table-scroll">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th>n</th><th>O(1)</th><th>O(log n)</th><th>O(n)</th><th>O(n log n)</th><th>O(n²)</th><th>O(2ⁿ)</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>2</td></tr><tr><td>10</td><td>1</td><td>3.32</td><td>10</td><td>33.2</td><td>100</td><td>1,024</td></tr><tr><td>100</td><td>1</td><td>6.64</td><td>100</td><td>664</td><td>10,000</td><td>1.27×10³⁰</td></tr><tr><td>1,000</td><td>1</td><td>9.97</td><td>1,000</td><td>9,966</td><td>10⁶</td><td>Massive</td></tr></tbody></table></div>
-<p><strong>Key Insight</strong>: Exponential and factorial complexities become impractical very quickly. Even O(n²) can be problematic for large inputs.</p>
-<h2 id="23-time-complexity-analysis"><a class="heading-anchor" href="#23-time-complexity-analysis">2.3 Time Complexity Analysis</a></h2>
-<h3 id="rules-for-analyzing-time-complexity"><a class="heading-anchor" href="#rules-for-analyzing-time-complexity">Rules for Analyzing Time Complexity</a></h3>
-<ol>
-<li><strong>Drop Constants</strong>: O(2n) becomes O(n)</li>
-<li><strong>Drop Lower Order Terms</strong>: O(n² + n + 1) becomes O(n²)</li>
-<li><strong>Different Terms for Inputs</strong>: O(a + b) for different inputs, O(a × b) for nested operations</li>
-<li><strong>Focus on Worst Case</strong>: Unless specified otherwise</li>
-</ol>
-<h3 id="examples-of-time-complexity-analysis"><a class="heading-anchor" href="#examples-of-time-complexity-analysis">Examples of Time Complexity Analysis</a></h3>
-<h4 id="example-1-simple-loop"><a class="heading-anchor" href="#example-1-simple-loop">Example 1: Simple Loop</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> printArray</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // O(n)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[i] </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> " "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#6A737D;--shiki-dark:#6A737D">              // O(1)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span><span style="color:#6A737D;--shiki-dark:#6A737D">                           // O(1)</span></span>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8;overflow-x:auto" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// O(n): work proportional to the array length</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">long</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> sum</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> std</span><span style="color:#24292E;--shiki-dark:#E1E4E8">::</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&lt;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&gt;</span><span style="color:#D73A49;--shiki-dark:#F97583">&amp;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> a</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    long</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> total </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x : a) total </span><span style="color:#D73A49;--shiki-dark:#F97583">+=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x;</span><span style="color:#6A737D;--shiki-dark:#6A737D">   // n iterations, O(1) each</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> total;</span></span>
 <span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Time Complexity: O(n)</span></span></code></pre>
-<h4 id="example-2-nested-loops"><a class="heading-anchor" href="#example-2-nested-loops">Example 2: Nested Loops</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> printPairs</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span><span style="color:#6A737D;--shiki-dark:#6A737D">        // O(n)</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span><span style="color:#6A737D;--shiki-dark:#6A737D"> // O(n)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "("</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[i] </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ", "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[j] </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ") "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Time Complexity: O(n²)</span></span></code></pre>
-<p><strong>Visualization of Nested Loop Execution</strong>:</p>
-<div class="mermaid-wrap"><pre class="mermaid">graph LR
-    subgraph Outer["Outer Loop: i = 0 to n-1"]
-        I0["i=0"] --> J0["j=1,2,3...n-1&#x3C;br/>n-1 iterations"]
-        I1["i=1"] --> J1["j=2,3,4...n-1&#x3C;br/>n-2 iterations"]
-        I2["i=2"] --> J2["j=3,4,5...n-1&#x3C;br/>n-3 iterations"]
-        I3["i=..."] --> J3["..."]
-        I4["i=n-1"] --> J4["j=n&#x3C;br/>0 iterations"]
-    end
-    
-    Total["Total: (n-1) + (n-2) + ... + 1&#x3C;br/>= n(n-1)/2 = O(n²)"]
-    
-    style Outer fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Total fill:#FFE5B4,stroke:#333,stroke-width:3px</pre></div>
-<h4 id="example-3-logarithmic-time"><a class="heading-anchor" href="#example-3-logarithmic-time">Example 3: Logarithmic Time</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> binarySearch</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> target</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> left </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> right </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    while</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (left </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> right) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> left </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (right </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> left) </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // O(1)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr[mid] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> target) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        } </span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#D73A49;--shiki-dark:#F97583"> if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr[mid] </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> target) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            left </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        } </span><span style="color:#D73A49;--shiki-dark:#F97583">else</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            right </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// O(n²): for each element, look at every other element</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> allPairs</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> std</span><span style="color:#24292E;--shiki-dark:#E1E4E8">::</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&lt;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&gt;</span><span style="color:#D73A49;--shiki-dark:#F97583">&amp;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> a</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">size_t</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&lt;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); </span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">i)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">size_t</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&lt;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> a.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); </span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">j)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">            consider</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(a[i], a[j]);</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // n(n-1)/2 pairs → O(n²)</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>That is genuinely most of the notation. The interesting part — the part most books skip — is
+what happens when two algorithms land in the <em>same</em> Big-O class, because that is where real
+engineering decisions actually live, and Big-O has just told you it cannot help.</p>
+<h2 id="what-big-o-throws-away-part-1-the-constant-factor"><a class="heading-anchor" href="#what-big-o-throws-away-part-1-the-constant-factor">What Big-O throws away, part 1: the constant factor</a></h2>
+<p>Here is the sentence that trips up most people who learned Big-O from a textbook: <strong>two
+algorithms that are both <code>O(n)</code> can differ in speed by 10×, 100×, or more.</strong> Big-O says they
+scale the same way. It says nothing about how much work each unit of that scaling costs.</p>
+<p>Consider two loops over the same array. Both touch every element exactly once. Both are <code>O(n)</code>.
+One adds each value into a running total; the other runs each value through a hash function
+first. Same number of iterations, same growth curve — but one does one operation per element
+and the other does fifteen.</p>
+<style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var a=(s,i,o)=>{let r=async()=>{await(await s())()},t=typeof i.value=="object"?i.value:void 0,c={rootMargin:t==null?void 0:t.rootMargin},n=new IntersectionObserver(e=>{for(let l of e)if(l.isIntersecting){n.disconnect(),r();break}},c);for(let e of o.children)n.observe(e)};(self.Astro||(self.Astro={})).visible=a;window.dispatchEvent(new Event("astro:visible"));})();</script><script>(()=>{var g=Object.defineProperty;var w=(c,s,d)=>s in c?g(c,s,{enumerable:!0,configurable:!0,writable:!0,value:d}):c[s]=d;var l=(c,s,d)=>w(c,typeof s!="symbol"?s+"":s,d);var E=new Set(["__proto__","constructor","prototype"]);{let c={0:t=>y(t),1:t=>d(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(d(t)),5:t=>new Set(d(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>Number.POSITIVE_INFINITY*t},s=t=>{let[p,e]=t;return p in c?c[p](e):void 0},d=t=>t.map(s),y=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([p,e])=>[p,s(e)]));class f extends HTMLElement{constructor(){super(...arguments);l(this,"Component");l(this,"hydrator");l(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let n=this.querySelectorAll("astro-slot"),r={},i=this.querySelectorAll("template[data-astro-template]");for(let o of i){let a=o.closest(this.tagName);a!=null&&a.isSameNode(this)&&(r[o.getAttribute("data-astro-template")||"default"]=o.innerHTML,o.remove())}for(let o of n){let a=o.closest(this.tagName);a!=null&&a.isSameNode(this)&&(r[o.getAttribute("name")||"default"]=o.innerHTML)}let u;try{u=this.hasAttribute("props")?y(JSON.parse(this.getAttribute("props"))):{}}catch(o){let a=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(a+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${a}`,this.getAttribute("props"),o),o}let h;await this.hydrator(this)(this.Component,u,r,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});l(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),n.disconnect(),this.childrenConnectedCallback()},n=new MutationObserver(()=>{var r;((r=this.lastChild)==null?void 0:r.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});n.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}getRetryImportUrl(e){let n=new URL(e,document.baseURI),r=`astro-retry=${Date.now()}`,i=n.hash.replace(/^#/,"");return n.hash=i?`${i}&${r}`:r,n.toString()}async importWithRetry(e){try{return await import(e)}catch(n){return await new Promise(r=>setTimeout(r,1e3)),import(this.getRetryImportUrl(e))}}handleHydrationError(e){let n=this.getAttribute("component-url"),r=new CustomEvent("astro:hydration-error",{cancelable:!0,bubbles:!0,composed:!0,detail:{error:e,componentUrl:n}});this.dispatchEvent(r)&&console.error(`[astro-island] Error hydrating ${n}`,e)}async start(){let e=JSON.parse(this.getAttribute("opts")),n=this.getAttribute("client");if(Astro[n]===void 0){window.addEventListener(`astro:${n}`,()=>this.start(),{once:!0});return}try{await Astro[n](async()=>{let r=this.getAttribute("renderer-url");try{let[i,{default:u}]=await Promise.all([this.importWithRetry(this.getAttribute("component-url")),r?this.importWithRetry(r):Promise.resolve({default:()=>()=>{}})]),h=this.getAttribute("component-export")||"default";if(h.includes(".")){this.Component=i;for(let m of h.split(".")){if(E.has(m)||!this.Component||typeof this.Component!="object"&&typeof this.Component!="function"||!Object.hasOwn(this.Component,m))throw new Error(`Invalid component export path: ${h}`);this.Component=this.Component[m]}}else{if(E.has(h))throw new Error(`Invalid component export path: ${h}`);this.Component=i[h]}return this.hydrator=u,this.hydrate}catch(i){return this.handleHydrationError(i),()=>{}}},e,this)}catch(r){this.handleHydrationError(r)}}attributeChangedCallback(){this.hydrate()}}l(f,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",f)}})();</script><astro-island uid="Z1sP8gV" prefix="r2" component-url="/_astro/Compare.BYRUuzC8.js" component-export="default" renderer-url="/_astro/client.CGNJ_0cx.js" props="{&quot;bench&quot;:[0,&quot;constantFactor&quot;],&quot;title&quot;:[0,&quot;Two O(n) loops over the same array&quot;],&quot;blurb&quot;:[0,&quot;The left loop sums each value; the right loop hashes each value before combining it. Both make one pass, both are O(n). The array is small enough to sit in cache, so this measures pure work-per-element — the constant Big-O discards.&quot;],&quot;seconds&quot;:[0,4],&quot;caption&quot;:[0,&quot;for the same element count and the same O(n) — the work per element is the only difference&quot;]}" ssr client="visible" opts="{&quot;name&quot;:&quot;Compare&quot;,&quot;value&quot;:true}" await-children><figure class="not-prose my-10 rounded-xl border p-5 sm:p-6" style="border-color:var(--border);background:var(--surface-2)"><div class="mb-1 text-xs font-semibold uppercase tracking-wider" style="color:var(--text-muted)">Live measurement</div><h3 class="mb-1 text-lg font-semibold" style="color:var(--text-primary)">Two O(n) loops over the same array</h3><p class="mb-5 max-w-2xl text-sm leading-relaxed" style="color:var(--text-secondary)">The left loop sums each value; the right loop hashes each value before combining it. Both make one pass, both are O(n). The array is small enough to sit in cache, so this measures pure work-per-element — the constant Big-O discards.</p><div class="flex flex-wrap items-center gap-3"><button class="rounded-lg px-4 py-2 text-sm font-semibold transition-opacity disabled:opacity-60" style="background:var(--accent);color:#fff">Run it on your machine</button><span class="text-xs" style="color:var(--text-muted)">takes about <!-- -->4<!-- -->s · nothing leaves your browser</span></div></figure><!--astro:end--></astro-island>
+<p>That gap is the <strong>constant factor</strong>, and Big-O deletes it by definition. In an interview, “it’s
+<code>O(n)</code>” is the right answer. In production, the constant factor is often the entire story:</p>
+<ul>
+<li><code>std::sort</code> is <code>O(n log n)</code> and beats a hand-written <code>O(n)</code> bucket sort on most real inputs,
+because its constant is tiny and the bucket sort’s is not.</li>
+<li>A linear scan of a small array beats a binary search on it, even though binary search is
+<code>O(log n)</code> and the scan is <code>O(n)</code> — the scan’s inner loop is a handful of instructions with
+no branch misprediction, and for small <code>n</code> that wins outright.</li>
+<li>Reading a value from L1 cache and reading one from main memory are both <code>O(1)</code>. One is about
+a hundred times slower than the other, which brings us to the second thing Big-O hides.</li>
+</ul>
+<h2 id="what-big-o-throws-away-part-2-where-the-data-lives"><a class="heading-anchor" href="#what-big-o-throws-away-part-2-where-the-data-lives">What Big-O throws away, part 2: where the data lives</a></h2>
+<p>Big-O’s founding assumption is that every memory access costs the same. That was roughly true
+in 1975. It has been false for thirty years. A modern CPU can execute a few hundred
+instructions in the time it takes to fetch one value from main memory, so processors keep small,
+fast caches in front of the big, slow RAM — and whether your data is in cache or not is
+invisible to Big-O, because a cache hit and a cache miss are both “one array access,” both <code>O(1)</code>.</p>
+<p>The classic demonstration is the array versus the linked list. Both store <code>n</code> elements. Walking
+either is <code>O(n)</code> — one dereference per element. But an array’s elements are laid out
+contiguously, so the CPU’s prefetcher sees the sequential pattern and fetches the next cache
+line before you ask for it. A linked list’s nodes are scattered wherever the allocator put them,
+so every <code>node-&gt;next</code> is a jump to an unpredictable address — a cache miss the hardware cannot
+hide.</p>
+<astro-island uid="Z3s3Jf" prefix="r3" component-url="/_astro/Compare.BYRUuzC8.js" component-export="default" renderer-url="/_astro/client.CGNJ_0cx.js" props="{&quot;bench&quot;:[0,&quot;arrayVsList&quot;],&quot;title&quot;:[0,&quot;Walking an array vs. walking a linked list&quot;],&quot;blurb&quot;:[0,&quot;The same 32 MiB of elements, visited once each. Contiguous (as a std::vector stores them) versus scattered across memory (as a std::list does). Identical element count, identical O(n), identical one-dereference-per-element.&quot;],&quot;seconds&quot;:[0,4],&quot;unit&quot;:[0,&quot;ns per element&quot;]}" ssr client="visible" opts="{&quot;name&quot;:&quot;Compare&quot;,&quot;value&quot;:true}" await-children><figure class="not-prose my-10 rounded-xl border p-5 sm:p-6" style="border-color:var(--border);background:var(--surface-2)"><div class="mb-1 text-xs font-semibold uppercase tracking-wider" style="color:var(--text-muted)">Live measurement</div><h3 class="mb-1 text-lg font-semibold" style="color:var(--text-primary)">Walking an array vs. walking a linked list</h3><p class="mb-5 max-w-2xl text-sm leading-relaxed" style="color:var(--text-secondary)">The same 32 MiB of elements, visited once each. Contiguous (as a std::vector stores them) versus scattered across memory (as a std::list does). Identical element count, identical O(n), identical one-dereference-per-element.</p><div class="flex flex-wrap items-center gap-3"><button class="rounded-lg px-4 py-2 text-sm font-semibold transition-opacity disabled:opacity-60" style="background:var(--accent);color:#fff">Run it on your machine</button><span class="text-xs" style="color:var(--text-muted)">takes about <!-- -->4<!-- -->s · nothing leaves your browser</span></div></figure><!--astro:end--></astro-island>
+<p>Same asymptotic complexity, and on most machines a 10–50× difference in wall-clock time. This
+is why <code>std::vector</code> is the right default container and <code>std::list</code> almost never is, despite
+the linked list’s theoretically attractive <code>O(1)</code> insertion. It is also why the chapter that
+this book is really about — <a href="https://github.com/sb2k16/data-structures-book/blob/main//chapters/memory-hierarchy">the memory hierarchy</a> — measures your
+machine’s cache in detail. For now the lesson is narrow and important: <strong>when two algorithms
+have the same Big-O, the one with the better memory-access pattern usually wins, and Big-O
+cannot see the difference.</strong></p>
+<h2 id="analyzing-time-complexity"><a class="heading-anchor" href="#analyzing-time-complexity">Analyzing time complexity</a></h2>
+<p>With the caveats in place, here is how you actually determine an algorithm’s Big-O. You count
+how the number of operations grows, keeping only the dominant term.</p>
+<p><strong>A single loop over the input is <code>O(n)</code>.</strong> <strong>Nested loops over the input multiply</strong> — two
+levels give <code>O(n²)</code>, three give <code>O(n³)</code>. <strong>Halving the search space each step is <code>O(log n)</code></strong> —
+the signature of binary search:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8;overflow-x:auto" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> binarySearch</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> std</span><span style="color:#24292E;--shiki-dark:#E1E4E8">::</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&lt;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&gt;</span><span style="color:#D73A49;--shiki-dark:#F97583">&amp;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> a</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> target</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lo </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, hi </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#D73A49;--shiki-dark:#F97583"> static_cast&lt;int&gt;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(a.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    while</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (lo </span><span style="color:#D73A49;--shiki-dark:#F97583">&lt;=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> hi) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lo </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (hi </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lo) </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span><span style="color:#6A737D;--shiki-dark:#6A737D">   // avoids lo+hi overflow</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (a[mid] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> target) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (a[mid] </span><span style="color:#D73A49;--shiki-dark:#F97583">&lt;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> target) lo </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        else</span><span style="color:#24292E;--shiki-dark:#E1E4E8">                 hi </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
 <span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
 <span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
 <span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Time Complexity: O(log n)</span></span></code></pre>
-<p><strong>Visualization of Binary Search</strong>:</p>
-<p>Binary search can be visualized as a decision tree where each node represents checking the middle element and branching left or right:</p>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Each step discards half the remaining range: O(log n).</span></span></code></pre>
+<p>For <strong>recursive</strong> algorithms, write a recurrence — the cost of a problem in terms of its
+subproblems — and solve it. Merge sort splits the array in two, sorts each half, and merges the
+results in linear time:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8;overflow-x:auto" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> mergeSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">std</span><span style="color:#24292E;--shiki-dark:#E1E4E8">::</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&lt;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&gt;</span><span style="color:#D73A49;--shiki-dark:#F97583">&amp;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> a</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> lo</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> hi</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (lo </span><span style="color:#D73A49;--shiki-dark:#F97583">&gt;=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> hi) </span><span style="color:#D73A49;--shiki-dark:#F97583">return</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lo </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (hi </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lo) </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    mergeSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(a, lo, mid);</span><span style="color:#6A737D;--shiki-dark:#6A737D">        // T(n/2)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    mergeSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(a, mid </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, hi);</span><span style="color:#6A737D;--shiki-dark:#6A737D">    // T(n/2)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    merge</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(a, lo, mid, hi);</span><span style="color:#6A737D;--shiki-dark:#6A737D">        // O(n) to merge</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Recurrence: T(n) = 2·T(n/2) + O(n)</span></span></code></pre>
+<p>You can <em>see</em> why that recurrence solves to <code>O(n log n)</code> by drawing the recursion tree. Each
+level does <code>O(n)</code> total work (the merges), and there are <code>log n</code> levels (you can only halve <code>n</code>
+that many times before reaching size 1):</p>
 <div class="mermaid-wrap"><pre class="mermaid">graph TD
-    Root["Array: [1,3,5,7,9,11,13,15]&#x3C;br/>Check: arr[3] = 7&#x3C;br/>Index: 3"]
-    
-    Root -->|Target &#x3C; 7| Left1["Left: [1,3,5]&#x3C;br/>Check: arr[1] = 3&#x3C;br/>Index: 1"]
-    Root -->|Target = 7| Found1["✓ Found at index 3"]
-    Root -->|Target > 7| Right1["Right: [9,11,13,15]&#x3C;br/>Check: arr[5] = 11&#x3C;br/>Index: 5"]
-    
-    Left1 -->|Target &#x3C; 3| Left2["Left: [1]&#x3C;br/>Check: arr[0] = 1&#x3C;br/>Index: 0"]
-    Left1 -->|Target = 3| Found2["✓ Found at index 1"]
-    Left1 -->|Target > 3| Right2["Right: [5]&#x3C;br/>Check: arr[2] = 5&#x3C;br/>Index: 2"]
-    
-    Right1 -->|Target &#x3C; 11| Left3["Left: [9]&#x3C;br/>Check: arr[4] = 9&#x3C;br/>Index: 4"]
-    Right1 -->|Target = 11| Found3["✓ Found at index 5"]
-    Right1 -->|Target > 11| Right3["Right: [13,15]&#x3C;br/>Check: arr[6] = 13&#x3C;br/>Index: 6"]
-    
-    Left2 -->|Target = 1| Found4["✓ Found at index 0"]
-    Left2 -->|Target ≠ 1| NotFound1["✗ Not found"]
-    
-    Right2 -->|Target = 5| Found5["✓ Found at index 2"]
-    Right2 -->|Target ≠ 5| NotFound2["✗ Not found"]
-    
-    Left3 -->|Target = 9| Found6["✓ Found at index 4"]
-    Left3 -->|Target ≠ 9| NotFound3["✗ Not found"]
-    
-    Right3 -->|Target &#x3C; 13| NotFound4["✗ Not found"]
-    Right3 -->|Target = 13| Found7["✓ Found at index 6"]
-    Right3 -->|Target > 13| Right4["Right: [15]&#x3C;br/>Check: arr[7] = 15&#x3C;br/>Index: 7"]
-    
-    Right4 -->|Target = 15| Found8["✓ Found at index 7"]
-    Right4 -->|Target ≠ 15| NotFound5["✗ Not found"]
-    
-    style Root fill:#FFE5B4,stroke:#333,stroke-width:3px
-    style Found1 fill:#90EE90,stroke:#333,stroke-width:3px
-    style Found2 fill:#90EE90,stroke:#333,stroke-width:3px
-    style Found3 fill:#90EE90,stroke:#333,stroke-width:3px
-    style Found4 fill:#90EE90,stroke:#333,stroke-width:3px
-    style Found5 fill:#90EE90,stroke:#333,stroke-width:3px
-    style Found6 fill:#90EE90,stroke:#333,stroke-width:3px
-    style Found7 fill:#90EE90,stroke:#333,stroke-width:3px
-    style Found8 fill:#90EE90,stroke:#333,stroke-width:3px
-    style NotFound1 fill:#FFB6C1,stroke:#333,stroke-width:2px
-    style NotFound2 fill:#FFB6C1,stroke:#333,stroke-width:2px
-    style NotFound3 fill:#FFB6C1,stroke:#333,stroke-width:2px
-    style NotFound4 fill:#FFB6C1,stroke:#333,stroke-width:2px
-    style NotFound5 fill:#FFB6C1,stroke:#333,stroke-width:2px</pre></div>
-<p><strong>Tree Structure Explanation</strong>:</p>
+    A[&quot;n&quot;] --&gt; B[&quot;n/2&quot;]
+    A --&gt; C[&quot;n/2&quot;]
+    B --&gt; D[&quot;n/4&quot;]
+    B --&gt; E[&quot;n/4&quot;]
+    C --&gt; F[&quot;n/4&quot;]
+    C --&gt; G[&quot;n/4&quot;]
+    D --&gt; H[&quot;…down to size 1&quot;]
+    E --&gt; H
+    F --&gt; H
+    G --&gt; H</pre></div>
+<p><code>O(n)</code> work per level × <code>log n</code> levels = <code>O(n log n)</code>. This picture generalizes: it is the
+intuition behind the Master Theorem, which Chapter 17 makes precise.</p>
+<h2 id="space-complexity-works-the-same-way"><a class="heading-anchor" href="#space-complexity-works-the-same-way">Space complexity works the same way</a></h2>
+<p>Space complexity measures <strong>auxiliary memory</strong> — extra space beyond the input — as a function
+of <code>n</code>. A loop using a few variables is <code>O(1)</code>; allocating a copy of the input is <code>O(n)</code>; a 2D
+table is <code>O(n²)</code>.</p>
+<p>One source is easy to miss: <strong>the call stack</strong>. Each pending recursive call holds a frame, so a
+recursion <code>n</code> deep uses <code>O(n)</code> stack space even if it allocates nothing itself. Merge sort’s
+<code>O(n log n)</code> time comes with <code>O(n)</code> auxiliary space for the merge buffers plus <code>O(log n)</code> stack;
+an in-place iterative algorithm might do the same work in <code>O(1)</code> space. That tension — spend
+memory to save time, or vice versa — is the <strong>space-time tradeoff</strong>, and it appears constantly:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-scroll"><table><thead><tr><th>Problem</th><th>Time-optimized</th><th>Space-optimized</th></tr></thead><tbody><tr><td>Detect duplicates</td><td><code>O(n)</code> time, <code>O(n)</code> space (hash set)</td><td><code>O(n log n)</code> time, <code>O(1)</code> space (sort first)</td></tr><tr><td>Fibonacci</td><td><code>O(n)</code> time, <code>O(n)</code> space (memoize)</td><td><code>O(n)</code> time, <code>O(1)</code> space (two rolling variables)</td></tr></tbody></table></div>
+<h2 id="best-average-and-worst-case"><a class="heading-anchor" href="#best-average-and-worst-case">Best, average, and worst case</a></h2>
+<p>An algorithm’s cost often depends on the <em>particular</em> input, not just its size, so we
+distinguish three cases. <strong>Worst case</strong> (the <code>O</code> you usually quote) is the ceiling — the most
+work any input of size <code>n</code> can force. <strong>Average case</strong> is the expected cost over typical inputs.
+<strong>Best case</strong> is the floor.</p>
+<p>Quicksort is the standard example: <code>O(n log n)</code> on average when pivots split the array roughly
+in half, but <code>O(n²)</code> in the worst case when every pivot is the smallest or largest element (a
+sorted array, with a naive pivot choice). Which number you care about depends on your setting —
+a real-time system that must never stutter budgets for the worst case; a batch job that runs
+overnight cares about the average.</p>
+<p>There is a subtler idea here too. <strong>Amortized analysis</strong> asks for the average cost per operation
+across a <em>sequence</em>, when occasional expensive operations are paid for by many cheap ones — and,
+unlike average-case analysis, it assumes nothing about the input distribution. The dynamic array
+(<code>std::vector</code>) is the canonical case: <code>push_back</code> is <code>O(1)</code> until the buffer fills, then it
+doubles capacity and copies everything, an <code>O(n)</code> operation. But doubling means those <code>O(n)</code>
+copies happen only at sizes 1, 2, 4, 8, …, so across <code>n</code> pushes the total copying work is <code>2n</code>,
+and the <strong>amortized</strong> cost per <code>push_back</code> is <code>O(1)</code>. The occasional expensive resize is spread
+across all the cheap insertions that preceded it.</p>
+<h2 id="engineering-judgment-when-the-theory-bends"><a class="heading-anchor" href="#engineering-judgment-when-the-theory-bends">Engineering judgment: when the theory bends</a></h2>
+<p>Everything above is true and useful. Here is how experienced engineers actually apply it, which
+is not by mechanically preferring the smaller Big-O.</p>
+<p><strong>For small <code>n</code>, growth rate barely matters.</strong> If <code>n</code> is always under a hundred — a config list,
+a game’s entities, the columns of a table — an <code>O(n²)</code> loop runs in microseconds and is often
+clearer than the <code>O(n log n)</code> alternative. Insertion sort is <code>O(n²)</code>, yet essentially every
+production sort (including <code>std::sort</code>) switches <em>to</em> insertion sort for subarrays below ~16
+elements, because below that size its tiny constant beats quicksort’s overhead. The asymptotically
+worse algorithm is the correct engineering choice.</p>
+<p><strong>Know where the crossover is.</strong> The right question is rarely “which has smaller Big-O” but “at
+my actual <code>n</code>, which is faster?” Two curves that cross at <code>n = 5,000</code> make the answer depend
+entirely on whether your inputs are usually larger or smaller than that — and the only way to
+know is to measure, which is what <a href="https://github.com/sb2k16/data-structures-book/blob/main//chapters/benchmarking-and-load-testing">Chapter 19</a> is about.</p>
+<p><strong>The constant factor and the memory pattern are not footnotes.</strong> As the two benchmarks above
+showed, they can be the whole difference between two same-Big-O algorithms. “It’s <code>O(n)</code>” ends
+the interview answer; it begins the production analysis.</p>
+<h2 id="complexity-mistakes-interviewers-love"><a class="heading-anchor" href="#complexity-mistakes-interviewers-love">Complexity mistakes interviewers love</a></h2>
+<p>A short catalog of hidden costs, because these are where the confident wrong answer usually
+happens — someone quotes the Big-O of the code they <em>wrote</em> and misses the Big-O of the calls
+they <em>made</em>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-scroll"><table><thead><tr><th>The code</th><th>Looks like</th><th>Actually is</th><th>Why</th></tr></thead><tbody><tr><td><code>v.insert(v.begin(), x)</code></td><td><code>O(1)</code></td><td><code>O(n)</code></td><td>Every later element shifts right</td></tr><tr><td><code>v.erase(v.begin())</code></td><td><code>O(1)</code></td><td><code>O(n)</code></td><td>Same shift, leftward</td></tr><tr><td><code>s += c</code> in a loop</td><td><code>O(n)</code></td><td>up to <code>O(n²)</code></td><td>Each append may reallocate and copy</td></tr><tr><td><code>find(v.begin(), v.end(), x)</code> in a loop</td><td><code>O(n)</code></td><td><code>O(n²)</code></td><td>A linear scan hidden inside a linear loop</td></tr><tr><td><code>unordered_map</code> lookup</td><td><code>O(1)</code></td><td><code>O(n)</code> worst case</td><td>Hash collisions can degrade every bucket to a list</td></tr></tbody></table></div>
+<p>The through-line: <strong>a library call is not free just because it is one line of your code.</strong> The
+complexity of a function includes the complexity of everything it calls. When you analyze a
+loop, look at what each line inside it actually costs — especially container mutations and
+searches, which are the usual culprits.</p>
+<h2 id="takeaways"><a class="heading-anchor" href="#takeaways">Takeaways</a></h2>
 <ul>
-<li><strong>Root</strong>: Initial array, check middle element</li>
-<li><strong>Left Branch</strong>: Target is smaller, search left half</li>
-<li><strong>Right Branch</strong>: Target is larger, search right half</li>
-<li><strong>Leaf Nodes</strong>: Either found (✓) or not found (✗)</li>
-<li><strong>Height</strong>: O(log n) - maximum depth of the tree</li>
-<li><strong>Nodes Visited</strong>: At most log₂(n) + 1 nodes for array of size n</li>
+<li><strong>Big-O measures growth rate</strong>, dropping constants and lower-order terms — the right tool for
+reasoning about scale, and the first thing to get right.</li>
+<li><strong>It deliberately hides the constant factor.</strong> Two <code>O(n)</code> algorithms can be 10× or 100× apart;
+you measured it above.</li>
+<li><strong>It deliberately hides the memory hierarchy.</strong> A cache hit and a cache miss are both <code>O(1)</code>,
+and the difference between them decides array-vs-list, which you also measured above.</li>
+<li><strong>Between two algorithms in the same complexity class</strong> — where most real decisions live — the
+constant factor and the memory-access pattern break the tie, and only measurement settles it.</li>
+<li><strong>Watch for hidden complexity</strong> in library calls, especially container inserts, erases, string
+appends, and searches inside loops.</li>
 </ul>
-<p><strong>Example Search Paths</strong>:</p>
-<ul>
-<li><strong>Searching for 7</strong>: Root → Found (1 comparison)</li>
-<li><strong>Searching for 5</strong>: Root → Left1 → Right2 → Found (3 comparisons)</li>
-<li><strong>Searching for 15</strong>: Root → Right1 → Right3 → Right4 → Found (4 comparisons)</li>
-<li><strong>Searching for 4</strong>: Root → Left1 → Right2 → Not Found (3 comparisons)</li>
-</ul>
-<p><strong>Key Insight</strong>: The tree has height O(log n), meaning we need at most O(log n) comparisons to find any element or determine it doesn’t exist.</p>
-<h4 id="example-4-multiple-operations"><a class="heading-anchor" href="#example-4-multiple-operations">Example 4: Multiple Operations</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> processData</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Sort the array: O(n log n)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sortedArr </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr;</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    sort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(sortedArr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), sortedArr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">());</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Print each element: O(n)</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num : sortedArr) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> " "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Binary search for each element: O(n log n)</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num : arr) {</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        binary_search</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(sortedArr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), sortedArr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), num);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Time Complexity: O(n log n) - dominated by the largest term</span></span></code></pre>
-<h3 id="recursive-time-complexity"><a class="heading-anchor" href="#recursive-time-complexity">Recursive Time Complexity</a></h3>
-<h4 id="example-5-fibonacci-inefficient"><a class="heading-anchor" href="#example-5-fibonacci-inefficient">Example 5: Fibonacci (Inefficient)</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> fibonacci</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> fibonacci</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> fibonacci</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Time Complexity: O(2ⁿ)</span></span></code></pre>
-<h4 id="example-6-merge-sort"><a class="heading-anchor" href="#example-6-merge-sort">Example 6: Merge Sort</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> merge</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> left</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> mid</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> right</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // O(n) - merging two sorted arrays</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> mergeSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> left</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> right</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (left </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> right) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mid </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> left </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (right </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> left) </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        mergeSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, left, mid);</span><span style="color:#6A737D;--shiki-dark:#6A737D">      // T(n/2)</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        mergeSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, mid </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, right);</span><span style="color:#6A737D;--shiki-dark:#6A737D"> // T(n/2)</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        merge</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, left, mid, right);</span><span style="color:#6A737D;--shiki-dark:#6A737D">   // O(n)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Recurrence: T(n) = 2T(n/2) + O(n)</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Time Complexity: O(n log n)</span></span></code></pre>
-<h2 id="24-space-complexity-analysis"><a class="heading-anchor" href="#24-space-complexity-analysis">2.4 Space Complexity Analysis</a></h2>
-<p>Space complexity measures the amount of memory an algorithm uses relative to the input size.</p>
-<h3 id="types-of-space-complexity"><a class="heading-anchor" href="#types-of-space-complexity">Types of Space Complexity</a></h3>
-<ol>
-<li><strong>Input Space</strong>: Memory used to store input data</li>
-<li><strong>Auxiliary Space</strong>: Extra space used by the algorithm (excluding input)</li>
-<li><strong>Total Space</strong>: Input space + auxiliary space</li>
-</ol>
-<h3 id="examples-of-space-complexity-analysis"><a class="heading-anchor" href="#examples-of-space-complexity-analysis">Examples of Space Complexity Analysis</a></h3>
-<h4 id="example-1-constant-space"><a class="heading-anchor" href="#example-1-constant-space">Example 1: Constant Space</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findMax</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">];</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // O(1) auxiliary space</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr[i] </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            maxVal </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[i];</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Space Complexity: O(1)</span></span></code></pre>
-<h4 id="example-2-linear-space"><a class="heading-anchor" href="#example-2-linear-space">Example 2: Linear Space</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">> </span><span style="color:#6F42C1;--shiki-dark:#B392F0">reverseArray</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#6F42C1;--shiki-dark:#B392F0"> reversed</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">());</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // O(n) auxiliary space</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        reversed[i] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i];</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> reversed;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Space Complexity: O(n)</span></span></code></pre>
-<h4 id="example-3-recursive-space"><a class="heading-anchor" href="#example-3-recursive-space">Example 3: Recursive Space</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> factorial</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(n </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Space Complexity: O(n) - due to recursion stack</span></span></code></pre>
-<h4 id="example-4-two-dimensional-space"><a class="heading-anchor" href="#example-4-two-dimensional-space">Example 4: Two-Dimensional Space</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>> </span><span style="color:#6F42C1;--shiki-dark:#B392F0">createMatrix</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> m</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>>(n, </span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">>(m, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">));</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Space Complexity: O(n × m)</span></span></code></pre>
-<h2 id="25-best-average-and-worst-case-analysis"><a class="heading-anchor" href="#25-best-average-and-worst-case-analysis">2.5 Best, Average, and Worst Case Analysis</a></h2>
-<h3 id="best-case-ω---omega"><a class="heading-anchor" href="#best-case-ω---omega">Best Case (Ω - Omega)</a></h3>
-<p>The minimum time/space required for any input of size n.</p>
-<h3 id="average-case-θ---theta"><a class="heading-anchor" href="#average-case-θ---theta">Average Case (Θ - Theta)</a></h3>
-<p>The expected time/space for a typical input of size n.</p>
-<h3 id="worst-case-o---big-o"><a class="heading-anchor" href="#worst-case-o---big-o">Worst Case (O - Big O)</a></h3>
-<p>The maximum time/space required for any input of size n.</p>
-<h3 id="example-quick-sort-analysis"><a class="heading-anchor" href="#example-quick-sort-analysis">Example: Quick Sort Analysis</a></h3>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> partition</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> low</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> high</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pivot </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[high];</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> low </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> low; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> high; j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr[j] </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pivot) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">            swap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr[i], arr[j]);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    swap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr[i </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">], arr[high]);</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> quickSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> low</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> high</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (low </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> high) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pivotIndex </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> partition</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, low, high);</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        quickSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, low, pivotIndex </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        quickSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr, pivotIndex </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, high);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<p><strong>Analysis:</strong></p>
-<ul>
-<li><strong>Best Case</strong>: O(n log n) - pivot always divides array in half</li>
-<li><strong>Average Case</strong>: O(n log n) - pivot is reasonably balanced on average</li>
-<li><strong>Worst Case</strong>: O(n²) - pivot is always the smallest or largest element</li>
-</ul>
-<h2 id="26-when-does-big-o-matter"><a class="heading-anchor" href="#26-when-does-big-o-matter">2.6 When Does Big-O Matter?</a></h2>
-<p>Understanding when complexity analysis matters helps you make practical decisions.</p>
-<h3 id="small-input-sizes-n--100"><a class="heading-anchor" href="#small-input-sizes-n--100">Small Input Sizes (n &#x3C; 100)</a></h3>
-<p><strong>Reality</strong>: For small inputs, Big-O often doesn’t matter!</p>
-<ul>
-<li>O(n²) vs O(n log n): Difference is milliseconds</li>
-<li>Constants and implementation details dominate</li>
-<li><strong>Example</strong>: Sorting 50 elements - even bubble sort is fast enough</li>
-</ul>
-<p><strong>When to Care</strong>:</p>
-<ul>
-<li>Tight loops (millions of iterations)</li>
-<li>Real-time constraints</li>
-<li>Embedded systems with limited resources</li>
-</ul>
-<h3 id="medium-input-sizes-100--n--10000"><a class="heading-anchor" href="#medium-input-sizes-100--n--10000">Medium Input Sizes (100 &#x3C; n &#x3C; 10,000)</a></h3>
-<p><strong>Reality</strong>: Big-O starts to matter, but constants still important</p>
-<ul>
-<li>O(n²) becomes noticeable but manageable</li>
-<li>O(n log n) vs O(n) - measurable difference</li>
-<li><strong>Example</strong>: Processing 1,000 records - choose wisely</li>
-</ul>
-<p><strong>When to Care</strong>:</p>
-<ul>
-<li>User-facing applications (perceived performance)</li>
-<li>Batch processing</li>
-<li>API endpoints</li>
-</ul>
-<h3 id="large-input-sizes-n--10000"><a class="heading-anchor" href="#large-input-sizes-n--10000">Large Input Sizes (n > 10,000)</a></h3>
-<p><strong>Reality</strong>: Big-O is critical!</p>
-<ul>
-<li>O(n²) can take seconds or minutes</li>
-<li>O(2ⁿ) becomes impractical</li>
-<li><strong>Example</strong>: Processing 1 million records - O(n²) = hours, O(n log n) = minutes</li>
-</ul>
-<p><strong>Always Care</strong>:</p>
-<ul>
-<li>Large-scale systems</li>
-<li>Data processing pipelines</li>
-<li>Search engines, databases</li>
-</ul>
-<h3 id="practical-example-when-on-is-fine"><a class="heading-anchor" href="#practical-example-when-on-is-fine">Practical Example: When O(n²) is Fine</a></h3>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// O(n²) is acceptable here!</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> processSmallDataset</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // n is always &#x3C; 100</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> data.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> data.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">            // Process pairs - simple and clear</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">            processPair</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(data[i], data[j]);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<p><strong>Why it’s fine</strong>:</p>
-<ul>
-<li>Input size is bounded and small</li>
-<li>Code is simpler than O(n log n) alternative</li>
-<li>Performance is acceptable</li>
-</ul>
-<h3 id="practical-example-when-on-is-a-problem"><a class="heading-anchor" href="#practical-example-when-on-is-a-problem">Practical Example: When O(n²) is a Problem</a></h3>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// O(n²) is a PROBLEM here!</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> processLargeDataset</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // n can be 1,000,000</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> data.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> data.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">            // This will take hours!</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">            processPair</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(data[i], data[j]);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<p><strong>Why it’s a problem</strong>:</p>
-<ul>
-<li>Input size is large and unbounded</li>
-<li>Performance degrades quadratically</li>
-<li>Must optimize to O(n log n) or better</li>
-</ul>
-<h2 id="27-common-pitfalls-in-complexity-analysis"><a class="heading-anchor" href="#27-common-pitfalls-in-complexity-analysis">2.7 Common Pitfalls in Complexity Analysis</a></h2>
-<h3 id="pitfall-1-confusing-on-with-actual-running-time"><a class="heading-anchor" href="#pitfall-1-confusing-on-with-actual-running-time">Pitfall 1: Confusing O(n) with Actual Running Time</a></h3>
-<p><strong>Mistake</strong>: “O(n) means it runs in n seconds”</p>
-<p><strong>Reality</strong>:</p>
-<ul>
-<li>O(n) means time scales linearly with input</li>
-<li>Actual time depends on:
-<ul>
-<li>Hardware speed</li>
-<li>Implementation details</li>
-<li>Constants (often ignored in Big-O)</li>
-</ul>
-</li>
-</ul>
-<p><strong>Example</strong>:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Both are O(n), but very different actual times</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> fastO</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x : arr) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        sum </span><span style="color:#D73A49;--shiki-dark:#F97583">+=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x;</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Simple addition</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> slowO</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> x : arr) {</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        complexComputation</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(x);</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Expensive operation</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<h3 id="pitfall-2-ignoring-constants-in-production-code"><a class="heading-anchor" href="#pitfall-2-ignoring-constants-in-production-code">Pitfall 2: Ignoring Constants in Production Code</a></h3>
-<p><strong>Mistake</strong>: “O(n) is always better than O(n log n)”</p>
-<p><strong>Reality</strong>: Constants matter in practice!</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// O(n log n) - but very fast constant</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> quickSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    sort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">());</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Highly optimized</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// O(n) - but slow constant</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> customLinear</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Custom implementation with overhead</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">        expensiveOperation</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr[i]);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<p><strong>When O(n log n) beats O(n)</strong>:</p>
-<ul>
-<li>O(n log n) with small constant &#x3C; O(n) with large constant</li>
-<li>Example: <code>std::sort</code> (O(n log n)) often faster than naive O(n) for small arrays</li>
-</ul>
-<h3 id="pitfall-3-missing-hidden-complexities"><a class="heading-anchor" href="#pitfall-3-missing-hidden-complexities">Pitfall 3: Missing Hidden Complexities</a></h3>
-<p><strong>Mistake</strong>: Not accounting for operations inside loops</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Looks like O(n), but actually O(n²)!</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> hiddenComplexity</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0">string</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> words</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (string word : words) {</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // O(n)</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#6F42C1;--shiki-dark:#B392F0">find</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(words.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), words.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), word) </span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> words.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // O(n)!</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">            // This is O(n) inside O(n) = O(n²)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<p><strong>Common Hidden Complexities</strong>:</p>
-<ul>
-<li>Sorting in a loop: O(n² log n) or worse</li>
-<li>String operations: Concatenation can be O(n) per operation</li>
-<li>Container operations: <code>vector::insert()</code> is O(n)</li>
-</ul>
-<h3 id="pitfall-4-worst-case-vs-average-case-confusion"><a class="heading-anchor" href="#pitfall-4-worst-case-vs-average-case-confusion">Pitfall 4: Worst Case vs. Average Case Confusion</a></h3>
-<p><strong>Mistake</strong>: Assuming worst case always happens</p>
-<p><strong>Reality</strong>:</p>
-<ul>
-<li>QuickSort: O(n²) worst case, O(n log n) average</li>
-<li>Hash table: O(n) worst case, O(1) average</li>
-<li><strong>Choose based on your use case</strong></li>
-</ul>
-<p><strong>When to Use Each</strong>:</p>
-<ul>
-<li><strong>Worst case</strong>: Safety-critical systems, real-time constraints</li>
-<li><strong>Average case</strong>: Most applications, when worst case is rare</li>
-<li><strong>Best case</strong>: When you can guarantee input characteristics</li>
-</ul>
-<h2 id="28-amortized-analysis"><a class="heading-anchor" href="#28-amortized-analysis">2.8 Amortized Analysis</a></h2>
-<p>Amortized analysis studies the time-averaged cost of executing a sequence of operations. It differs from average-case analysis in an important way: amortized analysis makes no assumptions about the probability distribution of inputs or data values, whereas average-case analysis relies on the assumption that inputs are not adversarial or “pathological.” For example, some sorting algorithms perform well on average over all input orderings but degrade severely on specific orderings.</p>
-<p>In contrast, amortized analysis is still a form of worst-case analysis—but applied to an entire sequence of operations rather than to each operation in isolation. By analyzing the sequence as a whole, it allows the cost of occasional expensive operations to be spread across many inexpensive ones, much like insurance spreads rare catastrophic losses across many small, predictable payments.</p>
-<p>Amortized analysis is motivated by the need to more accurately characterize the running time of algorithms for which traditional worst-case analysis is overly pessimistic. It is typically applied to methods that perform a sequence of operations in which most operations are inexpensive, while a few are costly. When these expensive operations occur infrequently, their cost can be spread—or amortized—across the many cheap operations. By charging the occasional high cost to the surrounding low-cost operations, we obtain a more realistic bound on the average cost per operation over the entire sequence.</p>
-<h3 id="example-dynamic-array-vector"><a class="heading-anchor" href="#example-dynamic-array-vector">Example: Dynamic Array (Vector)</a></h3>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">class</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> DynamicArray</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">private:</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> data;</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> size;</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> capacity;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">public:</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    DynamicArray</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() : </span><span style="color:#6F42C1;--shiki-dark:#B392F0">data</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">nullptr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">), </span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">), </span><span style="color:#6F42C1;--shiki-dark:#B392F0">capacity</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {}</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> push_back</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> value</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (size </span><span style="color:#D73A49;--shiki-dark:#F97583">>=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> capacity) {</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">            resize</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span><span style="color:#6A737D;--shiki-dark:#6A737D">  // Expensive operation</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        data[size</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> value;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">private:</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> resize</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> newCapacity </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> capacity </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#D73A49;--shiki-dark:#F97583"> ?</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> :</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> capacity </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> newData </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#D73A49;--shiki-dark:#F97583"> new</span><span style="color:#D73A49;--shiki-dark:#F97583"> int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">[newCapacity];</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> size; i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            newData[i] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> data[i];</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        delete[]</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> data;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        data </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> newData;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        capacity </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> newCapacity;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span></code></pre>
-<p><strong>Analysis:</strong>
-Capacity grows as <code>1, 2, 4, 8, 16, ..., 2^k</code>. There are only O(log n) resizes during n insertions.</p>
-<ul>
-<li>Total resize cost: O(n)</li>
-<li>Total non-resize inserts: n × O(1) = O(n)</li>
-<li>Amortized cost per push_back: O(n) / n = O(1)</li>
-<li>Sequence of n push_back operations: O(n) total time</li>
-<li>Average time per operation: O(1)</li>
-</ul>
-<h2 id="29-practical-complexity-analysis-examples"><a class="heading-anchor" href="#29-practical-complexity-analysis-examples">2.9 Practical Complexity Analysis Examples</a></h2>
-<h3 id="example-1-two-sum-problem"><a class="heading-anchor" href="#example-1-two-sum-problem">Example 1: Two Sum Problem</a></h3>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Brute Force Approach - O(n²)</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">> </span><span style="color:#6F42C1;--shiki-dark:#B392F0">twoSumBruteForce</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> nums</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> target</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (nums[i] </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums[j] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> target) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {i, j};</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {};</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Hash Map Approach - O(n)</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">> </span><span style="color:#6F42C1;--shiki-dark:#B392F0">twoSumHashMap</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> nums</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> target</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    unordered_map</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#D73A49;--shiki-dark:#F97583">int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> numMap;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> complement </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> target </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums[i];</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (numMap.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">find</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(complement) </span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> numMap.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {numMap[complement], i};</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        numMap[nums[i]] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {};</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<h3 id="example-2-finding-duplicates"><a class="heading-anchor" href="#example-2-finding-duplicates">Example 2: Finding Duplicates</a></h3>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Sorting Approach - O(n log n)</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> containsDuplicateSort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> nums</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    sort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">());</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (nums[i] </span><span style="color:#D73A49;--shiki-dark:#F97583">==</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> nums[i </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Hash Set Approach - O(n)</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">bool</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> containsDuplicateHash</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> nums</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    unordered_set</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> seen;</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num : nums) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (seen.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">find</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(num) </span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> seen.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">            return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        seen.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">insert</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(num);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> false</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<h2 id="210-space-time-tradeoffs"><a class="heading-anchor" href="#210-space-time-tradeoffs">2.10 Space-Time Tradeoffs</a></h2>
-<p>Many algorithms involve tradeoffs between time and space complexity:</p>
-<div class="table-scroll">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th>Problem</th><th>Time-Optimized</th><th>Space-Optimized</th></tr></thead><tbody><tr><td>Finding duplicates</td><td>O(n) time, O(n) space (hash set)</td><td>O(n log n) time, O(1) space (sorting)</td></tr><tr><td>Fibonacci</td><td>O(n) time, O(n) space (memoization)</td><td>O(n) time, O(1) space (iterative)</td></tr><tr><td>String matching</td><td>O(n) time, O(m) space (KMP)</td><td>O(nm) time, O(1) space (naive)</td></tr></tbody></table></div>
-<h2 id="211-master-theorem-preview"><a class="heading-anchor" href="#211-master-theorem-preview">2.11 Master Theorem Preview</a></h2>
-<p>The <strong>Master Theorem</strong> provides a formula for solving recurrence relations that arise in divide-and-conquer algorithms. This is a preview; we’ll see the full Master Theorem in Chapter 17 (Divide and Conquer).</p>
-<h3 id="what-is-a-recurrence-relation"><a class="heading-anchor" href="#what-is-a-recurrence-relation">What is a Recurrence Relation?</a></h3>
-<p>A <strong>recurrence relation</strong> expresses the time complexity of a recursive algorithm in terms of smaller inputs:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>T(n) = a × T(n/b) + f(n)</span></span></code></pre>
-<p>Where:</p>
-<ul>
-<li><code>T(n)</code> = time complexity for input of size <code>n</code></li>
-<li><code>a</code> = number of subproblems</li>
-<li><code>n/b</code> = size of each subproblem</li>
-<li><code>f(n)</code> = cost of dividing and combining</li>
-</ul>
-<h3 id="common-recurrence-patterns"><a class="heading-anchor" href="#common-recurrence-patterns">Common Recurrence Patterns</a></h3>
-<h4 id="pattern-1-binary-search"><a class="heading-anchor" href="#pattern-1-binary-search">Pattern 1: Binary Search</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>T(n) = T(n/2) + O(1)</span></span></code></pre>
-<ul>
-<li>One subproblem of half size</li>
-<li>Constant work to divide/combine</li>
-<li><strong>Solution</strong>: T(n) = O(log n)</li>
-</ul>
-<h4 id="pattern-2-merge-sort"><a class="heading-anchor" href="#pattern-2-merge-sort">Pattern 2: Merge Sort</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>T(n) = 2T(n/2) + O(n)</span></span></code></pre>
-<ul>
-<li>Two subproblems of half size</li>
-<li>Linear work to merge</li>
-<li><strong>Solution</strong>: T(n) = O(n log n)</li>
-</ul>
-<h4 id="pattern-3-quick-sort-average-case"><a class="heading-anchor" href="#pattern-3-quick-sort-average-case">Pattern 3: Quick Sort (Average Case)</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>T(n) = 2T(n/2) + O(n)</span></span></code></pre>
-<ul>
-<li>Two subproblems (on average)</li>
-<li>Linear work to partition</li>
-<li><strong>Solution</strong>: T(n) = O(n log n)</li>
-</ul>
-<h4 id="pattern-4-binary-tree-traversal"><a class="heading-anchor" href="#pattern-4-binary-tree-traversal">Pattern 4: Binary Tree Traversal</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>T(n) = 2T(n/2) + O(1)</span></span></code></pre>
-<ul>
-<li>Two subtrees</li>
-<li>Constant work per node</li>
-<li><strong>Solution</strong>: T(n) = O(n)</li>
-</ul>
-<h3 id="master-theorem-informal-preview"><a class="heading-anchor" href="#master-theorem-informal-preview">Master Theorem (Informal Preview)</a></h3>
-<p>The Master Theorem provides three cases based on the relationship between <code>f(n)</code> and <code>n^(log_b(a))</code>:</p>
-<p><strong>Case 1</strong>: If <code>f(n) = O(n^(log_b(a) - ε))</code> for some ε > 0</p>
-<ul>
-<li><strong>Then</strong>: T(n) = Θ(n^(log_b(a)))</li>
-<li><strong>Example</strong>: T(n) = 2T(n/2) + O(n^0.5) → T(n) = Θ(n)</li>
-</ul>
-<p><strong>Case 2</strong>: If <code>f(n) = Θ(n^(log_b(a)) × log^k(n))</code> for some k ≥ 0</p>
-<ul>
-<li><strong>Then</strong>: T(n) = Θ(n^(log_b(a)) × log^(k+1)(n))</li>
-<li><strong>Example</strong>: T(n) = 2T(n/2) + O(n) → T(n) = Θ(n log n)</li>
-</ul>
-<p><strong>Case 3</strong>: If <code>f(n) = Ω(n^(log_b(a) + ε))</code> for some ε > 0</p>
-<ul>
-<li><strong>Then</strong>: T(n) = Θ(f(n))</li>
-<li><strong>Example</strong>: T(n) = 2T(n/2) + O(n²) → T(n) = Θ(n²)</li>
-</ul>
-<h3 id="why-this-matters"><a class="heading-anchor" href="#why-this-matters">Why This Matters</a></h3>
-<p>Understanding recurrence relations helps you:</p>
-<ol>
-<li><strong>Analyze recursive algorithms</strong> quickly</li>
-<li><strong>Predict performance</strong> before implementing</li>
-<li><strong>Compare algorithms</strong> with similar structures</li>
-<li><strong>Design efficient algorithms</strong> by choosing good divide strategies</li>
-</ol>
-<h3 id="examples-youll-see-later"><a class="heading-anchor" href="#examples-youll-see-later">Examples You’ll See Later</a></h3>
-<p><strong>Chapter 17 (Divide and Conquer)</strong> will cover:</p>
-<ul>
-<li>Full Master Theorem with proofs</li>
-<li>More complex recurrence relations</li>
-<li>Applications to sorting, searching, and other algorithms</li>
-</ul>
-<p><strong>For Now</strong>: Recognize that divide-and-conquer algorithms often have recurrences like <code>T(n) = aT(n/b) + f(n)</code>, and the Master Theorem helps solve them.</p>
-<h3 id="quick-reference"><a class="heading-anchor" href="#quick-reference">Quick Reference</a></h3>
-<div class="table-scroll">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th>Recurrence</th><th>Solution</th><th>Algorithm</th></tr></thead><tbody><tr><td>T(n) = T(n/2) + O(1)</td><td>O(log n)</td><td>Binary Search</td></tr><tr><td>T(n) = 2T(n/2) + O(n)</td><td>O(n log n)</td><td>Merge Sort</td></tr><tr><td>T(n) = 2T(n/2) + O(1)</td><td>O(n)</td><td>Tree Traversal</td></tr><tr><td>T(n) = T(n-1) + O(1)</td><td>O(n)</td><td>Linear Recursion</td></tr><tr><td>T(n) = T(n-1) + O(n)</td><td>O(n²)</td><td>Selection Sort</td></tr></tbody></table></div>
-<h2 id="212-key-takeaways"><a class="heading-anchor" href="#212-key-takeaways">2.12 Key Takeaways</a></h2>
-<ol>
-<li><strong>Big O notation</strong> describes the upper bound of algorithm performance</li>
-<li><strong>Time complexity</strong> measures how runtime scales with input size</li>
-<li><strong>Space complexity</strong> measures how memory usage scales with input size</li>
-<li><strong>Worst-case analysis</strong> is most commonly used for algorithm comparison</li>
-<li><strong>Amortized analysis</strong> provides average performance over many operations</li>
-<li><strong>Space-time tradeoffs</strong> are common in algorithm design</li>
-</ol>
-<h2 id="213-exercises"><a class="heading-anchor" href="#213-exercises">2.13 Exercises</a></h2>
-<ol>
-<li>Analyze the time and space complexity of the following function:</li>
-</ol>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">void</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> mystery</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#E36209;--shiki-dark:#FFAB70"> n</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n; i</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i; j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n; j</span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> " "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> j </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<ol start="2">
-<li>
-<p>Compare the time complexity of linear search vs. binary search on a sorted array of size n.</p>
-</li>
-<li>
-<p>What is the space complexity of merge sort? Can you optimize it?</p>
-</li>
-<li>
-<p>Analyze the amortized time complexity of inserting n elements into a dynamic array.</p>
-</li>
-<li>
-<p>Given two algorithms: Algorithm A runs in O(n²) time with O(1) space, and Algorithm B runs in O(n) time with O(n) space. Which would you choose for a system with limited memory?</p>
-</li>
-</ol>
-<h2 id="214-summary"><a class="heading-anchor" href="#214-summary">2.14 Summary</a></h2>
-<p>Understanding complexity analysis is fundamental to becoming an effective programmer. It allows you to make informed decisions about algorithm selection, predict performance characteristics, and optimize code when necessary. The ability to analyze and compare different approaches to the same problem is a crucial skill that will serve you well in interviews, competitive programming, and real-world software development.</p>
-<p>In the next chapter, we’ll explore basic data structures, starting with arrays and strings, and see how our understanding of complexity analysis helps us choose the right data structure for different problems.</p></div><nav class="mt-20 grid gap-3 sm:grid-cols-2"><a href="/chapters/introduction" class="rounded-xl border p-4 no-underline transition-colors hover:bg-[var(--surface-2)]" style="border-color: var(--border)"><div class="text-xs" style="color: var(--text-muted)">← Chapter 1</div><div class="mt-1 text-sm font-semibold" style="color: var(--text-primary)">Introduction to Data Structures and Algorithms</div></a><a href="/chapters/basic-data-structures" class="rounded-xl border p-4 text-right no-underline transition-colors hover:bg-[var(--surface-2)] sm:col-start-2" style="border-color: var(--border)"><div class="text-xs" style="color: var(--text-muted)">Chapter 3 →</div><div class="mt-1 text-sm font-semibold" style="color: var(--text-primary)">Arrays and Strings</div></a></nav><div class="mt-14"></div></article><aside class="hidden lg:block"><div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"><div class="mb-3 text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">On this page</div><ul class="space-y-1.5 text-sm"><li style="padding-left: 0rem"><a href="#21-introduction-to-complexity-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.1 Introduction to Complexity Analysis</a></li><li style="padding-left: 0rem"><a href="#22-big-o-notation" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.2 Big O Notation</a></li><li style="padding-left: 0.75rem"><a href="#mathematical-definition" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Mathematical Definition</a></li><li style="padding-left: 0.75rem"><a href="#common-big-o-notations-from-best-to-worst" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Common Big O Notations (from best to worst)</a></li><li style="padding-left: 0.75rem"><a href="#visual-representation-of-growth-rates" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Visual Representation of Growth Rates</a></li><li style="padding-left: 0rem"><a href="#23-time-complexity-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.3 Time Complexity Analysis</a></li><li style="padding-left: 0.75rem"><a href="#rules-for-analyzing-time-complexity" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Rules for Analyzing Time Complexity</a></li><li style="padding-left: 0.75rem"><a href="#examples-of-time-complexity-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Examples of Time Complexity Analysis</a></li><li style="padding-left: 0.75rem"><a href="#recursive-time-complexity" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Recursive Time Complexity</a></li><li style="padding-left: 0rem"><a href="#24-space-complexity-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.4 Space Complexity Analysis</a></li><li style="padding-left: 0.75rem"><a href="#types-of-space-complexity" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Types of Space Complexity</a></li><li style="padding-left: 0.75rem"><a href="#examples-of-space-complexity-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Examples of Space Complexity Analysis</a></li><li style="padding-left: 0rem"><a href="#25-best-average-and-worst-case-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.5 Best, Average, and Worst Case Analysis</a></li><li style="padding-left: 0.75rem"><a href="#best-case-ω---omega" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Best Case (Ω - Omega)</a></li><li style="padding-left: 0.75rem"><a href="#average-case-θ---theta" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Average Case (Θ - Theta)</a></li><li style="padding-left: 0.75rem"><a href="#worst-case-o---big-o" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Worst Case (O - Big O)</a></li><li style="padding-left: 0.75rem"><a href="#example-quick-sort-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Example: Quick Sort Analysis</a></li><li style="padding-left: 0rem"><a href="#26-when-does-big-o-matter" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.6 When Does Big-O Matter?</a></li><li style="padding-left: 0.75rem"><a href="#small-input-sizes-n--100" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Small Input Sizes (n &lt; 100)</a></li><li style="padding-left: 0.75rem"><a href="#medium-input-sizes-100--n--10000" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Medium Input Sizes (100 &lt; n &lt; 10,000)</a></li><li style="padding-left: 0.75rem"><a href="#large-input-sizes-n--10000" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Large Input Sizes (n &gt; 10,000)</a></li><li style="padding-left: 0.75rem"><a href="#practical-example-when-on-is-fine" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Practical Example: When O(n²) is Fine</a></li><li style="padding-left: 0.75rem"><a href="#practical-example-when-on-is-a-problem" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Practical Example: When O(n²) is a Problem</a></li><li style="padding-left: 0rem"><a href="#27-common-pitfalls-in-complexity-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.7 Common Pitfalls in Complexity Analysis</a></li><li style="padding-left: 0.75rem"><a href="#pitfall-1-confusing-on-with-actual-running-time" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Pitfall 1: Confusing O(n) with Actual Running Time</a></li><li style="padding-left: 0.75rem"><a href="#pitfall-2-ignoring-constants-in-production-code" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Pitfall 2: Ignoring Constants in Production Code</a></li><li style="padding-left: 0.75rem"><a href="#pitfall-3-missing-hidden-complexities" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Pitfall 3: Missing Hidden Complexities</a></li><li style="padding-left: 0.75rem"><a href="#pitfall-4-worst-case-vs-average-case-confusion" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Pitfall 4: Worst Case vs. Average Case Confusion</a></li><li style="padding-left: 0rem"><a href="#28-amortized-analysis" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.8 Amortized Analysis</a></li><li style="padding-left: 0.75rem"><a href="#example-dynamic-array-vector" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Example: Dynamic Array (Vector)</a></li><li style="padding-left: 0rem"><a href="#29-practical-complexity-analysis-examples" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.9 Practical Complexity Analysis Examples</a></li><li style="padding-left: 0.75rem"><a href="#example-1-two-sum-problem" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Example 1: Two Sum Problem</a></li><li style="padding-left: 0.75rem"><a href="#example-2-finding-duplicates" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Example 2: Finding Duplicates</a></li><li style="padding-left: 0rem"><a href="#210-space-time-tradeoffs" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.10 Space-Time Tradeoffs</a></li><li style="padding-left: 0rem"><a href="#211-master-theorem-preview" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.11 Master Theorem Preview</a></li><li style="padding-left: 0.75rem"><a href="#what-is-a-recurrence-relation" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">What is a Recurrence Relation?</a></li><li style="padding-left: 0.75rem"><a href="#common-recurrence-patterns" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Common Recurrence Patterns</a></li><li style="padding-left: 0.75rem"><a href="#master-theorem-informal-preview" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Master Theorem (Informal Preview)</a></li><li style="padding-left: 0.75rem"><a href="#why-this-matters" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Why This Matters</a></li><li style="padding-left: 0.75rem"><a href="#examples-youll-see-later" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Examples You’ll See Later</a></li><li style="padding-left: 0.75rem"><a href="#quick-reference" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Quick Reference</a></li><li style="padding-left: 0rem"><a href="#212-key-takeaways" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.12 Key Takeaways</a></li><li style="padding-left: 0rem"><a href="#213-exercises" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.13 Exercises</a></li><li style="padding-left: 0rem"><a href="#214-summary" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">2.14 Summary</a></li></ul></div></aside></div></main><footer class="mt-24 border-t" style="border-color: var(--border)"><div class="mx-auto max-w-6xl px-5 py-10 text-sm" style="color: var(--text-muted)"><p>A free, open-source book. MIT licensed —<a href="https://github.com/sb2k16/data-structures-book" class="underline" style="color: var(--text-secondary)" rel="noopener">read it, fork it, teach from it</a>.</p><p class="mt-1.5">Every benchmark on this site runs in your browser. Nothing is uploaded, and no result leaves the tab.</p></div></footer><script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.rNgEMDoa.js"></script></body></html>
+<p>Next, <a href="https://github.com/sb2k16/data-structures-book/blob/main//chapters/basic-data-structures">arrays and strings</a> — the contiguous, cache-friendly
+foundation that most fast data structures are quietly built on, and the first place the memory
+lessons here start paying off.</p></div><nav class="mt-20 grid gap-3 sm:grid-cols-2"><a href="/chapters/introduction" class="rounded-xl border p-4 no-underline transition-colors hover:bg-[var(--surface-2)]" style="border-color: var(--border)"><div class="text-xs" style="color: var(--text-muted)">← Chapter 1</div><div class="mt-1 text-sm font-semibold" style="color: var(--text-primary)">Introduction to Data Structures and Algorithms</div></a><a href="/chapters/basic-data-structures" class="rounded-xl border p-4 text-right no-underline transition-colors hover:bg-[var(--surface-2)] sm:col-start-2" style="border-color: var(--border)"><div class="text-xs" style="color: var(--text-muted)">Chapter 3 →</div><div class="mt-1 text-sm font-semibold" style="color: var(--text-primary)">Arrays and Strings</div></a></nav><div class="mt-10"></div><div class="mt-8"></div></article><aside class="hidden lg:block"><div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"><div class="mb-3 text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">On this page</div><ul class="space-y-1.5 text-sm"><li style="padding-left: 0rem"><a href="#big-o-in-one-page" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Big-O in one page</a></li><li style="padding-left: 0rem"><a href="#what-big-o-throws-away-part-1-the-constant-factor" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">What Big-O throws away, part 1: the constant factor</a></li><li style="padding-left: 0rem"><a href="#what-big-o-throws-away-part-2-where-the-data-lives" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">What Big-O throws away, part 2: where the data lives</a></li><li style="padding-left: 0rem"><a href="#analyzing-time-complexity" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Analyzing time complexity</a></li><li style="padding-left: 0rem"><a href="#space-complexity-works-the-same-way" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Space complexity works the same way</a></li><li style="padding-left: 0rem"><a href="#best-average-and-worst-case" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Best, average, and worst case</a></li><li style="padding-left: 0rem"><a href="#engineering-judgment-when-the-theory-bends" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Engineering judgment: when the theory bends</a></li><li style="padding-left: 0rem"><a href="#complexity-mistakes-interviewers-love" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Complexity mistakes interviewers love</a></li><li style="padding-left: 0rem"><a href="#takeaways" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Takeaways</a></li></ul></div></aside></div></main><footer class="mt-24 border-t" style="border-color: var(--border)"><div class="mx-auto max-w-6xl px-5 py-10 text-sm" style="color: var(--text-muted)"><p>A free, open-source book. MIT licensed —<a href="https://github.com/sb2k16/data-structures-book" class="underline" style="color: var(--text-secondary)" rel="noopener">read it, fork it, teach from it</a>.</p><p class="mt-1.5">Every benchmark on this site runs in your browser. Nothing is uploaded, and no result leaves the tab.</p></div></footer><script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.rNgEMDoa.js"></script></body></html>

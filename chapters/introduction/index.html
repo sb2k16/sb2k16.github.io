@@ -1,602 +1,73 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Introduction to Data Structures and Algorithms — Data Structures on Real Hardware</title><meta name="description" content="What a data structure actually is, and why the choice of one decides the shape of everything above it."><link rel="canonical" href="https://sb2k16.github.io/chapters/introduction/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="sitemap" href="/sitemap-index.xml"><meta property="og:type" content="article"><meta property="og:title" content="Introduction to Data Structures and Algorithms"><meta property="og:description" content="What a data structure actually is, and why the choice of one decides the shape of everything above it."><meta property="og:url" content="https://sb2k16.github.io/chapters/introduction/"><meta property="og:image" content="https://sb2k16.github.io/og-default.png"><meta property="og:site_name" content="Data Structures on Real Hardware"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Introduction to Data Structures and Algorithms"><meta name="twitter:description" content="What a data structure actually is, and why the choice of one decides the shape of everything above it."><meta name="twitter:image" content="https://sb2k16.github.io/og-default.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Introduction to Data Structures and Algorithms","headline":"Introduction to Data Structures and Algorithms","description":"What a data structure actually is, and why the choice of one decides the shape of everything above it.","url":"https://sb2k16.github.io/chapters/introduction/","author":{"@type":"Person","name":"Souvik Bhattacherjee"}}</script><script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Introduction to Data Structures and Algorithms — Data Structures on Systems</title><meta name="description" content="What a data structure actually is, and why the choice of one decides the shape of everything above it."><link rel="canonical" href="https://sb2k16.github.io/chapters/introduction/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="sitemap" href="/sitemap-index.xml"><meta property="og:type" content="article"><meta property="og:title" content="Introduction to Data Structures and Algorithms"><meta property="og:description" content="What a data structure actually is, and why the choice of one decides the shape of everything above it."><meta property="og:url" content="https://sb2k16.github.io/chapters/introduction/"><meta property="og:image" content="https://sb2k16.github.io/og-default.png"><meta property="og:site_name" content="Data Structures on Systems"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Introduction to Data Structures and Algorithms"><meta name="twitter:description" content="What a data structure actually is, and why the choice of one decides the shape of everything above it."><meta name="twitter:image" content="https://sb2k16.github.io/og-default.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Introduction to Data Structures and Algorithms","headline":"Introduction to Data Structures and Algorithms","description":"What a data structure actually is, and why the choice of one decides the shape of everything above it.","url":"https://sb2k16.github.io/chapters/introduction/","author":{"@type":"Person","name":"Souvik Bhattacherjee"}}</script><script>
       const stored = localStorage.getItem('theme');
       if (stored === 'dark' || stored === 'light') {
         document.documentElement.dataset.theme = stored;
       }
-    </script><link rel="stylesheet" href="/_astro/Base.CoKL3ywM.css"></head><body><a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:px-3 focus:py-2" style="background: var(--surface-1); color: var(--text-primary)">Skip to content</a><header class="sticky top-0 z-40 border-b backdrop-blur" style="border-color: var(--border); background: color-mix(in srgb, var(--surface-1) 88%, transparent)"><nav class="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5"><a href="/" class="flex items-center gap-2 text-sm font-semibold no-underline" style="color: var(--text-primary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="8" width="20" height="8" rx="1.5" stroke="var(--accent)" stroke-width="1.8"></rect><path d="M7 8v8M12 8v8M17 8v8" stroke="var(--accent)" stroke-width="1.8"></path></svg>Real Hardware</a><div class="ml-auto flex items-center gap-1 text-sm"><a href="/chapters" class="rounded-md px-2.5 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:px-3" style="color: var(--text-secondary)">Chapters</a><a href="/chapters/memory-hierarchy" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)">Benchmarks</a><a href="https://github.com/sb2k16/data-structures-book" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)" rel="noopener">GitHub</a><button id="theme-toggle" type="button" aria-label="Toggle color theme" class="rounded-md p-2 transition-colors" data-astro-cid-l6lhmie6><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" class="sun-core" data-astro-cid-l6lhmie6></circle><g class="sun-rays" data-astro-cid-l6lhmie6><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-l6lhmie6></path></g><path class="moon" d="M20 14.5A8 8 0 019.5 4 8.5 8.5 0 1020 14.5z" fill="currentColor" stroke="none" data-astro-cid-l6lhmie6></path></svg></button><script type="module">var e=document.documentElement;document.getElementById(`theme-toggle`)?.addEventListener(`click`,()=>{let t=(e.dataset.theme??(matchMedia(`(prefers-color-scheme: dark)`).matches?`dark`:`light`))===`dark`?`light`:`dark`;e.dataset.theme=t,localStorage.setItem(`theme`,t)});</script></div></nav></header><main id="main"><div class="mx-auto max-w-6xl px-5 py-12 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12"><article class="min-w-0"><header class="mb-10"><div class="text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">Chapter 1 · Foundations</div><h1 class="mt-2 text-3xl font-bold leading-tight tracking-tight sm:text-4xl" style="color: var(--text-primary)">Introduction to Data Structures and Algorithms</h1><p class="mt-3 max-w-2xl text-base leading-relaxed" style="color: var(--text-secondary)">What a data structure actually is, and why the choice of one decides the shape of everything above it.</p></header><div class="prose"><h2 id="11-what-are-data-structures-and-algorithms"><a class="heading-anchor" href="#11-what-are-data-structures-and-algorithms">1.1 What Are Data Structures and Algorithms?</a></h2>
-<h3 id="data-structures"><a class="heading-anchor" href="#data-structures">Data Structures</a></h3>
-<p>A <strong>data structure</strong> is a way of organizing and storing data in a computer so that it can be accessed and modified efficiently. Think of data structures as containers that hold data in specific arrangements, each optimized for particular types of operations.</p>
-<div class="mermaid-wrap"><pre class="mermaid">graph TD
-    DS["Data Structures"]
-    DS --> Linear["Linear Structures"]
-    DS --> NonLinear["Non-Linear Structures"]
-    
-    Linear --> Array["Array&#x3C;br/>Contiguous memory&#x3C;br/>Fast access"]
-    Linear --> LinkedList["Linked List&#x3C;br/>Non-contiguous&#x3C;br/>Easy insertion"]
-    Linear --> Stack["Stack&#x3C;br/>LIFO&#x3C;br/>Function calls"]
-    Linear --> Queue["Queue&#x3C;br/>FIFO&#x3C;br/>Task scheduling"]
-    
-    NonLinear --> Tree["Tree&#x3C;br/>Hierarchical&#x3C;br/>Search operations"]
-    NonLinear --> Graph["Graph&#x3C;br/>Relationships&#x3C;br/>Networks"]
-    NonLinear --> Hash["Hash Table&#x3C;br/>Key-value pairs&#x3C;br/>Fast lookup"]
-    
-    style DS fill:#FFE5B4,stroke:#333,stroke-width:3px
-    style Linear fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style NonLinear fill:#CCE6FF,stroke:#333,stroke-width:2px
-    style Array fill:#90EE90,stroke:#333,stroke-width:2px
-    style LinkedList fill:#90EE90,stroke:#333,stroke-width:2px
-    style Stack fill:#90EE90,stroke:#333,stroke-width:2px
-    style Queue fill:#90EE90,stroke:#333,stroke-width:2px
-    style Tree fill:#87CEEB,stroke:#333,stroke-width:2px
-    style Graph fill:#87CEEB,stroke:#333,stroke-width:2px
-    style Hash fill:#87CEEB,stroke:#333,stroke-width:2px</pre></div>
-<p>For example:</p>
+    </script><link rel="stylesheet" href="/_astro/Base.DENnS0ax.css"></head><body><a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:px-3 focus:py-2" style="background: var(--surface-1); color: var(--text-primary)">Skip to content</a><header class="sticky top-0 z-40 border-b backdrop-blur" style="border-color: var(--border); background: color-mix(in srgb, var(--surface-1) 88%, transparent)"><nav class="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5"><a href="/" class="flex items-center gap-2 text-sm font-semibold no-underline" style="color: var(--text-primary)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="8" width="20" height="8" rx="1.5" stroke="var(--accent)" stroke-width="1.8"></rect><path d="M7 8v8M12 8v8M17 8v8" stroke="var(--accent)" stroke-width="1.8"></path></svg><span class="hidden sm:inline">Data Structures on Systems</span><span class="sm:hidden">Data Structures</span></a><div class="ml-auto flex items-center gap-1 text-sm"><a href="/chapters" class="rounded-md px-2.5 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:px-3" style="color: var(--text-secondary)">Chapters</a><a href="/chapters/memory-hierarchy" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)">Benchmarks</a><a href="https://github.com/sb2k16/data-structures-book" class="hidden rounded-md px-3 py-1.5 no-underline transition-colors hover:bg-[var(--surface-3)] sm:block" style="color: var(--text-secondary)" rel="noopener">GitHub</a><button id="theme-toggle" type="button" aria-label="Toggle color theme" class="rounded-md p-2 transition-colors" data-astro-cid-l6lhmie6><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" data-astro-cid-l6lhmie6><circle cx="12" cy="12" r="4" class="sun-core" data-astro-cid-l6lhmie6></circle><g class="sun-rays" data-astro-cid-l6lhmie6><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" data-astro-cid-l6lhmie6></path></g><path class="moon" d="M20 14.5A8 8 0 019.5 4 8.5 8.5 0 1020 14.5z" fill="currentColor" stroke="none" data-astro-cid-l6lhmie6></path></svg></button><script type="module">var e=document.documentElement;document.getElementById(`theme-toggle`)?.addEventListener(`click`,()=>{let t=(e.dataset.theme??(matchMedia(`(prefers-color-scheme: dark)`).matches?`dark`:`light`))===`dark`?`light`:`dark`;e.dataset.theme=t,localStorage.setItem(`theme`,t)});</script></div></nav></header><main id="main"><div class="mx-auto max-w-6xl px-5 py-12 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12"><article class="min-w-0"><header class="mb-10"><div class="text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">Chapter 1 · Foundations</div><h1 class="mt-2 text-3xl font-bold leading-tight tracking-tight sm:text-4xl" style="color: var(--text-primary)">Introduction to Data Structures and Algorithms</h1><p class="mt-3 max-w-2xl text-base leading-relaxed" style="color: var(--text-secondary)">What a data structure actually is, and why the choice of one decides the shape of everything above it.</p></header><div class="prose"><p>There is no shortage of books on data structures and algorithms. This one is different in a
+specific way, and it’s worth saying up front so you can decide whether it’s the book you want.</p>
+<p>Most books teach data structures as abstractions and stop at Big-O. You learn that a hash table
+is <code>O(1)</code> and a balanced tree is <code>O(log n)</code>, you memorize the operations, and you move on. That
+knowledge is necessary and it is not sufficient, because on a real machine running real software,
+the abstraction leaks everywhere. Two <code>O(n)</code> loops can differ by 50×. A linked list and an array
+have the same traversal complexity and the array is often forty times faster. The “constant
+factors” that Big-O throws away are frequently the entire story — and the reason your database
+index is a B-tree and not a binary tree, the reason <code>std::vector</code> is almost always the right
+default, and the reason a cache in front of your database can bring the whole system down when a
+server is added.</p>
+<p><strong>This book teaches data structures the way working systems actually use them</strong> — down to the
+cache line the CPU fetches, and out to the cluster of machines a distributed database runs on. It
+is opinionated, it is measured (many chapters run live benchmarks you can execute yourself), and
+it is built around a single question asked of every structure: <em>why does this exist, and what
+problem with the previous one does it solve?</em></p>
+<h2 id="the-through-line"><a class="heading-anchor" href="#the-through-line">The through-line</a></h2>
+<p>The structures in this book are not a disconnected list. Each one exists because the one before it
+hit a wall:</p>
 <ul>
-<li>An <strong>array</strong> stores elements in contiguous memory locations, allowing fast access by index</li>
-<li>A <strong>linked list</strong> connects elements through pointers, enabling efficient insertion and deletion</li>
-<li>A <strong>tree</strong> organizes data hierarchically, facilitating search operations</li>
+<li>An <strong>array</strong> gives you unbeatable cache performance, but inserting in the middle is <code>O(n)</code>.</li>
+<li>A <strong>linked list</strong> makes insertion <code>O(1)</code> — by scattering its nodes across memory and giving up
+the cache performance that made arrays fast.</li>
+<li>A <strong>hash table</strong> gives you <code>O(1)</code> lookup — by throwing away all ordering.</li>
+<li>A <strong>tree</strong> restores ordering <em>and</em> <code>O(log n)</code> operations — but a binary tree pays a cache miss on
+every level.</li>
+<li>A <strong>B-tree</strong> fixes that with wide, cache-line-sized nodes, which is why every database index is
+one — but its in-place updates punish write-heavy workloads.</li>
+<li>An <strong>LSM tree</strong> turns those random writes into sequential appends — and when one machine is no
+longer enough, <strong>consistent hashing</strong> spreads the data across many, landing us back at the
+hashing idea we started with, now running a distributed database.</li>
 </ul>
-<h3 id="algorithms"><a class="heading-anchor" href="#algorithms">Algorithms</a></h3>
-<p>An <strong>algorithm</strong> is a step-by-step procedure or set of rules for solving a computational problem. It’s a well-defined sequence of instructions that transforms input into the desired output.</p>
-<div class="mermaid-wrap"><pre class="mermaid">flowchart LR
-    Input["Input&#x3C;br/>Problem Data"] --> Algorithm["Algorithm&#x3C;br/>Step-by-Step Process"]
-    Algorithm --> Output["Output&#x3C;br/>Solution"]
-    
-    Algorithm --> Step1["Step 1"]
-    Algorithm --> Step2["Step 2"]
-    Algorithm --> Step3["Step 3"]
-    Step1 --> Step2
-    Step2 --> Step3
-    Step3 --> Output
-    
-    style Input fill:#90EE90,stroke:#333,stroke-width:2px
-    style Algorithm fill:#FFE5B4,stroke:#333,stroke-width:3px
-    style Output fill:#87CEEB,stroke:#333,stroke-width:2px
-    style Step1 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Step2 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Step3 fill:#E6F3FF,stroke:#333,stroke-width:2px</pre></div>
-<p>Consider searching for a name in a phone book:</p>
+<p>Follow that arc and you don’t just learn a catalog of structures; you learn the reasoning that
+produced them, which is the thing that actually transfers to the systems you build.</p>
+<h2 id="who-this-is-for"><a class="heading-anchor" href="#who-this-is-for">Who this is for</a></h2>
+<p>Software engineers and serious students who already write code and want to understand what happens
+<em>beneath</em> the interface. You should be comfortable reading modern C++ (the examples use C++17/20)
+and know what a pointer, a loop, and a class are. You do not need a computer-science degree or any
+prior algorithms coursework.</p>
+<p>This is not a first programming tutorial, and it is not an exhaustive academic reference. It favors
+the structures you will actually use, explained with the depth that makes you good at using them:
+their invariants, their failure modes, their behavior on real hardware, and where they show up in
+production systems like Redis, PostgreSQL, the Linux kernel, and search engines.</p>
+<h2 id="how-to-read-it"><a class="heading-anchor" href="#how-to-read-it">How to read it</a></h2>
+<p>The chapters build on each other and are best read roughly in order, at least through the core
+structures — the through-line above only works if you follow it. That said, each chapter stands on
+its own well enough to be a reference when you come back to it later, which is the real test of a
+book like this: whether you <em>return</em> to it.</p>
+<p>Read it online, where the interactive benchmarks run in your own browser on your own CPU — a claim
+about performance means far more when you watch it happen on your machine than when you read a
+number someone else measured. The code examples are complete and compile; they live alongside the
+book in the repository so you can run and modify them.</p>
+<p>A note on complexity analysis, since it’s the one piece of formal machinery the rest of the book
+leans on: <a href="/chapters/complexity-analysis">Chapter 2</a> covers Big-O, and just as importantly, the two
+things Big-O deliberately hides — the constant factor and the memory hierarchy — that decide which
+<code>O(n)</code> algorithm actually wins. If you read only one foundational chapter closely, read that one.</p>
+<h2 id="what-each-chapter-gives-you"><a class="heading-anchor" href="#what-each-chapter-gives-you">What each chapter gives you</a></h2>
 <ul>
-<li><strong>Linear search</strong>: Check each name from beginning to end</li>
-<li><strong>Binary search</strong>: Open to the middle, eliminate half, repeat</li>
+<li><strong>Why it exists</strong> — the problem it solves that the previous structure couldn’t.</li>
+<li><strong>How it works</strong> — the core mechanism and its invariants, with correct, modern C++.</li>
+<li><strong>What it costs on real hardware</strong> — cache behavior, memory layout, and (where it sharpens the
+point) a live benchmark.</li>
+<li><strong>Where it lives in production</strong> — the real systems built on it.</li>
+<li><strong>Engineering judgment</strong> — when to actually reach for it, and when not to.</li>
+<li><strong>An interview checklist</strong> — the questions you’ll be asked and the mistakes to avoid.</li>
 </ul>
-<p>Both are algorithms, but they have different efficiency characteristics.</p>
-<div class="mermaid-wrap"><pre class="mermaid">graph LR
-    subgraph Linear["Linear Search"]
-        L1["Check 1"] --> L2["Check 2"]
-        L2 --> L3["Check 3"]
-        L3 --> L4["..."]
-        L4 --> L5["Check n"]
-    end
-    
-    subgraph Binary["Binary Search"]
-        B1["Check middle"] --> B2{"Found?"}
-        B2 -->|No| B3["Eliminate half"]
-        B3 --> B4["Check new middle"]
-        B4 --> B2
-        B2 -->|Yes| B5["Found!"]
-    end
-    
-    style Linear fill:#FFB6C1,stroke:#333,stroke-width:2px
-    style Binary fill:#90EE90,stroke:#333,stroke-width:2px</pre></div>
-<h2 id="12-who-this-book-is-for"><a class="heading-anchor" href="#12-who-this-book-is-for">1.2 Who This Book Is For</a></h2>
-<p>This book is written for <strong>software engineers and advanced students</strong> who want to understand data structures not just as abstract concepts, but as tools used in real systems.</p>
-<h3 id="target-audience"><a class="heading-anchor" href="#target-audience">Target Audience</a></h3>
-<p><strong>Primary Audience:</strong></p>
-<ul>
-<li>Software engineers preparing for technical interviews</li>
-<li>Computer science students seeking practical understanding</li>
-<li>Developers who want to write efficient, production-ready code</li>
-<li>Engineers who need to make informed decisions about system design</li>
-</ul>
-<p><strong>What This Book Is:</strong></p>
-<ul>
-<li>A practical guide with real-world implementations</li>
-<li>Focused on understanding <em>why</em> and <em>when</em> to use each structure</li>
-<li>Emphasizes invariants, failure modes, and system-level considerations</li>
-<li>Provides production-ready C++ code examples</li>
-</ul>
-<p><strong>What This Book Is Not:</strong></p>
-<ul>
-<li>Not a pure theoretical computer science textbook</li>
-<li>Not a comprehensive reference manual (we focus on commonly used structures)</li>
-<li>Not a beginner’s programming tutorial (assumes basic C++ knowledge)</li>
-<li>Not limited to academic exercises (includes real-world pitfalls and optimizations)</li>
-</ul>
-<h3 id="learning-approach"><a class="heading-anchor" href="#learning-approach">Learning Approach</a></h3>
-<p>This book emphasizes:</p>
-<ol>
-<li><strong>Invariant-based thinking</strong>: Understanding the core properties that must always hold</li>
-<li><strong>Failure modes</strong>: Common pitfalls and how to avoid them</li>
-<li><strong>System awareness</strong>: Memory layout, cache behavior, and performance implications</li>
-<li><strong>Practical reasoning</strong>: Why certain operations are fast or slow in practice</li>
-</ol>
-<h2 id="13-why-dsa-matters-real-world-impact"><a class="heading-anchor" href="#13-why-dsa-matters-real-world-impact">1.3 Why DSA Matters: Real-World Impact</a></h2>
-<p>Data structures and algorithms are not just academic exercises—they power the systems we use every day. Understanding them helps you build better software and solve real-world problems.</p>
-<h3 id="real-world-applications"><a class="heading-anchor" href="#real-world-applications">Real-World Applications</a></h3>
-<p><strong>Search Engines (Google’s PageRank)</strong>:</p>
-<ul>
-<li>Uses graph algorithms to rank web pages</li>
-<li>Hash tables for fast indexing</li>
-<li>Efficient data structures handle billions of web pages</li>
-<li><strong>Without DSA</strong>: Google search would be impossibly slow</li>
-</ul>
-<p><strong>Social Networks (Facebook, LinkedIn)</strong>:</p>
-<ul>
-<li>Graph algorithms for friend recommendations</li>
-<li>Efficient data structures for billions of users</li>
-<li>Shortest path algorithms for connection suggestions</li>
-<li><strong>Without DSA</strong>: Social networks couldn’t scale</li>
-</ul>
-<p><strong>E-Commerce (Amazon, Netflix)</strong>:</p>
-<ul>
-<li>Recommendation systems use collaborative filtering (matrix operations)</li>
-<li>Hash tables for product lookups</li>
-<li>Sorting algorithms for search results</li>
-<li><strong>Without DSA</strong>: Recommendations would be inaccurate or too slow</li>
-</ul>
-<p><strong>Navigation Systems (Google Maps, GPS)</strong>:</p>
-<ul>
-<li>Shortest path algorithms (Dijkstra’s, A*)</li>
-<li>Graph data structures for road networks</li>
-<li>Efficient routing for millions of users</li>
-<li><strong>Without DSA</strong>: GPS navigation wouldn’t work</li>
-</ul>
-<p><strong>Databases (MySQL, PostgreSQL)</strong>:</p>
-<ul>
-<li>B-trees for indexing</li>
-<li>Hash tables for fast lookups</li>
-<li>Sorting algorithms for queries</li>
-<li><strong>Without DSA</strong>: Databases would be unusably slow</li>
-</ul>
-<p><strong>Operating Systems</strong>:</p>
-<ul>
-<li>Process scheduling (priority queues)</li>
-<li>Memory management (hash tables, trees)</li>
-<li>File systems (tree structures)</li>
-<li><strong>Without DSA</strong>: Operating systems couldn’t function</li>
-</ul>
-<h3 id="why-study-data-structures-and-algorithms"><a class="heading-anchor" href="#why-study-data-structures-and-algorithms">Why Study Data Structures and Algorithms?</a></h3>
-<h4 id="1-problem-solving-foundation"><a class="heading-anchor" href="#1-problem-solving-foundation">1. Problem-Solving Foundation</a></h4>
-<p>Data structures and algorithms form the backbone of computer science. They teach you how to:</p>
-<ul>
-<li>Break down complex problems into manageable parts</li>
-<li>Think systematically about solutions</li>
-<li>Optimize for both time and space efficiency</li>
-</ul>
-<h4 id="2-technical-interview-preparation"><a class="heading-anchor" href="#2-technical-interview-preparation">2. Technical Interview Preparation</a></h4>
-<p>Most technology companies assess candidates on:</p>
-<ul>
-<li>Algorithm design and analysis</li>
-<li>Data structure selection and implementation</li>
-<li>Problem-solving approach and coding ability</li>
-</ul>
-<h4 id="3-performance-optimization"><a class="heading-anchor" href="#3-performance-optimization">3. Performance Optimization</a></h4>
-<p>Understanding algorithms helps you:</p>
-<ul>
-<li>Choose the right data structure for your problem</li>
-<li>Optimize existing code for better performance</li>
-<li>Predict system behavior under different loads</li>
-</ul>
-<h4 id="4-software-engineering-best-practices"><a class="heading-anchor" href="#4-software-engineering-best-practices">4. Software Engineering Best Practices</a></h4>
-<ul>
-<li>Writing maintainable and efficient code</li>
-<li>Understanding trade-offs between different approaches</li>
-<li>Making informed decisions about system design</li>
-</ul>
-<h3 id="dsa-in-the-software-stack"><a class="heading-anchor" href="#dsa-in-the-software-stack">DSA in the Software Stack</a></h3>
-<div class="mermaid-wrap"><pre class="mermaid">graph TD
-    Apps["Applications&#x3C;br/>Web, Mobile, Desktop"]
-    Apps --> Frameworks["Frameworks &#x26; Libraries&#x3C;br/>React, Django, Spring"]
-    Frameworks --> DS["Data Structures &#x26; Algorithms&#x3C;br/>Hash Tables, Trees, Graphs"]
-    DS --> Systems["System Software&#x3C;br/>OS, Compilers, Databases"]
-    Systems --> Hardware["Hardware&#x3C;br/>CPU, Memory, Storage"]
-    
-    style DS fill:#FFE5B4,stroke:#333,stroke-width:3px
-    style Apps fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Frameworks fill:#CCE6FF,stroke:#333,stroke-width:2px
-    style Systems fill:#B3D9FF,stroke:#333,stroke-width:2px
-    style Hardware fill:#99CCFF,stroke:#333,stroke-width:2px</pre></div>
-<p><strong>Key Insight</strong>: DSA is the foundation that enables all software layers above it. Understanding DSA helps you make better decisions at every level.</p>
-<h2 id="13-problem-solving-methodology"><a class="heading-anchor" href="#13-problem-solving-methodology">1.3 Problem-Solving Methodology</a></h2>
-<div class="mermaid-wrap"><pre class="mermaid">flowchart TD
-    Start([Start]) --> Understand["Step 1: Understand&#x3C;br/>the Problem"]
-    Understand --> Design["Step 2: Design&#x3C;br/>the Algorithm"]
-    Design --> Analyze["Step 3: Analyze&#x3C;br/>Complexity"]
-    Analyze --> Implement["Step 4: Implement&#x3C;br/>the Solution"]
-    Implement --> Test["Step 5: Test&#x3C;br/>and Optimize"]
-    Test --> Correct{Correct&#x3C;br/>&#x26;&#x3C;br/>Efficient?}
-    Correct -->|No| Design
-    Correct -->|Yes| End([Solution Complete])
-    
-    style Start fill:#90EE90,stroke:#333,stroke-width:3px
-    style Understand fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Design fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Analyze fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Implement fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Test fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Correct fill:#FFE5B4,stroke:#333,stroke-width:2px
-    style End fill:#90EE90,stroke:#333,stroke-width:3px</pre></div>
-<h3 id="step-1-understand-the-problem"><a class="heading-anchor" href="#step-1-understand-the-problem">Step 1: Understand the Problem</a></h3>
-<p>Before writing any code, ensure you fully understand:</p>
-<ul>
-<li>What is the input?</li>
-<li>What is the expected output?</li>
-<li>Are there any constraints or edge cases?</li>
-<li>What are the requirements (time/space limits)?</li>
-</ul>
-<h3 id="step-2-design-the-algorithm"><a class="heading-anchor" href="#step-2-design-the-algorithm">Step 2: Design the Algorithm</a></h3>
-<ul>
-<li>Break the problem into smaller subproblems</li>
-<li>Identify patterns or similar problems you’ve seen</li>
-<li>Consider different approaches and their trade-offs</li>
-<li>Choose the most appropriate data structures</li>
-</ul>
-<h3 id="step-3-analyze-complexity"><a class="heading-anchor" href="#step-3-analyze-complexity">Step 3: Analyze Complexity</a></h3>
-<ul>
-<li>Determine time and space complexity</li>
-<li>Consider best-case, average-case, and worst-case scenarios</li>
-<li>Ensure the solution meets performance requirements</li>
-</ul>
-<h3 id="step-4-implement-the-solution"><a class="heading-anchor" href="#step-4-implement-the-solution">Step 4: Implement the Solution</a></h3>
-<ul>
-<li>Write clean, readable code</li>
-<li>Handle edge cases appropriately</li>
-<li>Add comments for complex logic</li>
-<li>Test with various inputs</li>
-</ul>
-<h3 id="step-5-test-and-optimize"><a class="heading-anchor" href="#step-5-test-and-optimize">Step 5: Test and Optimize</a></h3>
-<ul>
-<li>Verify correctness with test cases</li>
-<li>Profile performance if needed</li>
-<li>Optimize if requirements aren’t met</li>
-<li>Refactor for better maintainability</li>
-</ul>
-<h2 id="14-how-to-use-this-book"><a class="heading-anchor" href="#14-how-to-use-this-book">1.4 How to Use This Book</a></h2>
-<h3 id="learning-paths"><a class="heading-anchor" href="#learning-paths">Learning Paths</a></h3>
-<p>This book is designed to be flexible. Choose the path that matches your goals:</p>
-<h4 id="path-1-interview-preparation-8-12-weeks"><a class="heading-anchor" href="#path-1-interview-preparation-8-12-weeks">Path 1: Interview Preparation (8-12 weeks)</a></h4>
-<p><strong>Focus</strong>: Practical problem-solving for technical interviews</p>
-<p><strong>Chapters to Study</strong>:</p>
-<ul>
-<li>Chapters 3-6: Core data structures (Arrays, Linked Lists, Stacks, Queues, Trees)</li>
-<li>Chapters 9-13: Essential algorithms (Sorting, Searching, Hash Tables, Graphs, DP)</li>
-<li>Chapter 15: Problem-solving strategies</li>
-<li>Chapter 8: Recursion and Backtracking</li>
-</ul>
-<p><strong>Time Commitment</strong>: 10-15 hours/week
-<strong>Skip</strong>: Chapters 7, 14, 16-18 (advanced topics)</p>
-<p><strong>Goal</strong>: Be interview-ready with strong problem-solving skills</p>
-<h4 id="path-2-computer-science-student-1-semester"><a class="heading-anchor" href="#path-2-computer-science-student-1-semester">Path 2: Computer Science Student (1 semester)</a></h4>
-<p><strong>Focus</strong>: Comprehensive understanding of DSA fundamentals</p>
-<p><strong>Chapters to Study</strong>: All chapters in order
-<strong>Time Commitment</strong>: 6-8 hours/week
-<strong>Projects</strong>: Complete projects at end of each part</p>
-<p><strong>Goal</strong>: Solid theoretical and practical foundation</p>
-<h4 id="path-3-working-professional-self-paced"><a class="heading-anchor" href="#path-3-working-professional-self-paced">Path 3: Working Professional (Self-paced)</a></h4>
-<p><strong>Focus</strong>: Fill knowledge gaps, practical application</p>
-<p><strong>Approach</strong>:</p>
-<ul>
-<li>Identify gaps in your knowledge</li>
-<li>Deep dive into specific chapters</li>
-<li>Apply concepts to your work projects</li>
-</ul>
-<p><strong>Time Commitment</strong>: 5-10 hours/week (flexible)
-<strong>Goal</strong>: Improve code quality and system design skills</p>
-<h3 id="what-to-expect"><a class="heading-anchor" href="#what-to-expect">What to Expect</a></h3>
-<p><strong>Book Structure</strong>:</p>
-<ul>
-<li><strong>Part I: Foundations</strong> (Chapters 1-2): Introduction and complexity analysis</li>
-<li><strong>Part II: Linear Data Structures</strong> (Chapters 3-5): Arrays, Linked Lists, Stacks, Queues</li>
-<li><strong>Part III: Non-Linear Data Structures</strong> (Chapters 6-11): Trees, Graphs, Hash Tables, String Algorithms</li>
-<li><strong>Part IV: Algorithm Design Paradigms</strong> (Chapters 12-17): DP, Greedy, Divide &#x26; Conquer</li>
-<li><strong>Part V: Advanced Topics</strong> (Chapter 18): Modern optimizations</li>
-</ul>
-<p><strong>Each Chapter Includes</strong>:</p>
-<ul>
-<li>Core concepts with clear explanations</li>
-<li>Code implementations in C++</li>
-<li>Complexity analysis</li>
-<li>Real-world applications</li>
-<li>Practice exercises</li>
-<li>Systems perspective (where applicable)</li>
-</ul>
-<p><strong>Learning Progression</strong>:</p>
-<ol>
-<li><strong>Understand</strong>: Read explanations and study examples</li>
-<li><strong>Implement</strong>: Write code yourself (don’t just copy)</li>
-<li><strong>Analyze</strong>: Understand time/space complexity</li>
-<li><strong>Apply</strong>: Solve exercises and practice problems</li>
-<li><strong>Connect</strong>: See how concepts relate across chapters</li>
-</ol>
-<h3 id="prerequisites"><a class="heading-anchor" href="#prerequisites">Prerequisites</a></h3>
-<p><strong>Required Knowledge</strong>:</p>
-<ul>
-<li><strong>Programming</strong>: Basic C++ (variables, loops, functions, classes)</li>
-<li><strong>Mathematics</strong>: Basic algebra, logarithms</li>
-<li><strong>Computer Science</strong>: Basic understanding of memory and CPU</li>
-</ul>
-<p><strong>Prerequisite Self-Assessment</strong>:</p>
-<p>Can you answer these questions? If yes, you’re ready!</p>
-<ol>
-<li>
-<p><strong>C++ Basics</strong>:</p>
-<ul class="contains-task-list">
-<li class="task-list-item"><input type="checkbox" disabled> Can you write a function that takes parameters and returns a value?</li>
-<li class="task-list-item"><input type="checkbox" disabled> Do you understand pointers and references?</li>
-<li class="task-list-item"><input type="checkbox" disabled> Can you use STL containers (vector, map, set)?</li>
-<li class="task-list-item"><input type="checkbox" disabled> Do you understand classes and objects?</li>
-</ul>
-</li>
-<li>
-<p><strong>Problem-Solving</strong>:</p>
-<ul class="contains-task-list">
-<li class="task-list-item"><input type="checkbox" disabled> Can you break down a problem into smaller steps?</li>
-<li class="task-list-item"><input type="checkbox" disabled> Can you trace through code execution?</li>
-<li class="task-list-item"><input type="checkbox" disabled> Do you understand basic control flow (if/else, loops)?</li>
-</ul>
-</li>
-<li>
-<p><strong>Mathematics</strong>:</p>
-<ul class="contains-task-list">
-<li class="task-list-item"><input type="checkbox" disabled> Can you work with exponents and logarithms?</li>
-<li class="task-list-item"><input type="checkbox" disabled> Do you understand basic functions (linear, quadratic)?</li>
-<li class="task-list-item"><input type="checkbox" disabled> Can you analyze simple mathematical relationships?</li>
-</ul>
-</li>
-</ol>
-<p><strong>If you answered “No” to 3+ questions</strong>: Consider reviewing C++ basics first. This book assumes familiarity with programming fundamentals.</p>
-<p><strong>If you answered “Yes” to most questions</strong>: You’re ready! This book will build on your foundation.</p>
-<h3 id="visual-roadmap"><a class="heading-anchor" href="#visual-roadmap">Visual Roadmap</a></h3>
-<div class="mermaid-wrap"><pre class="mermaid">graph LR
-    Start[Start Here] --> Ch1[Ch 1: Introduction]
-    Ch1 --> Ch2[Ch 2: Complexity]
-    Ch2 --> Ch3[Ch 3: Arrays]
-    Ch3 --> Ch4[Ch 4: Linked Lists]
-    Ch4 --> Ch5[Ch 5: Stacks/Queues]
-    Ch5 --> Ch6[Ch 6: Trees]
-    Ch6 --> Ch8[Ch 8: Recursion]
-    Ch8 --> Ch9[Ch 9: Sorting]
-    Ch9 --> Ch10[Ch 10: Hash Tables]
-    Ch10 --> Ch11[Ch 11: Graphs]
-    Ch11 --> Ch12[Ch 12: DP]
-    Ch12 --> Ch15[Ch 15: Problem Solving]
-    Ch15 --> Advanced[Advanced Topics]
-    
-    style Start fill:#90EE90,stroke:#333,stroke-width:3px
-    style Ch1 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch2 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch3 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch4 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch5 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch6 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch8 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch9 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch10 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch11 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch12 fill:#E6F3FF,stroke:#333,stroke-width:2px
-    style Ch15 fill:#FFE5B4,stroke:#333,stroke-width:2px
-    style Advanced fill:#FFB6C1,stroke:#333,stroke-width:2px</pre></div>
-<h2 id="15-programming-environment-setup"><a class="heading-anchor" href="#15-programming-environment-setup">1.5 Programming Environment Setup</a></h2>
-<h3 id="c-compiler-setup"><a class="heading-anchor" href="#c-compiler-setup">C++ Compiler Setup</a></h3>
-<p>For this book, we’ll use modern C++ (C++17/C++20) features. Ensure you have:</p>
-<h4 id="option-1-gccg"><a class="heading-anchor" href="#option-1-gccg">Option 1: GCC/G++</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># Install on Ubuntu/Debian</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> update</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> g++</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># Install on macOS</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">brew</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> gcc</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># Check version</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">g++</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --version</span></span></code></pre>
-<h4 id="option-2-clang"><a class="heading-anchor" href="#option-2-clang">Option 2: Clang</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># Install on macOS (comes with Xcode)</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">xcode-select</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --install</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># Install on Ubuntu/Debian</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">sudo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> apt</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> clang</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># Check version</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">clang++</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --version</span></span></code></pre>
-<h3 id="compilation-commands"><a class="heading-anchor" href="#compilation-commands">Compilation Commands</a></h3>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># Basic compilation</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">g++</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -std=c++17</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -o</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> program</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> source.cpp</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># With debugging information</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">g++</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -std=c++17</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -g</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -o</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> program</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> source.cpp</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># With optimization</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">g++</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -std=c++17</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -O2</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -o</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> program</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> source.cpp</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># With warnings</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">g++</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -std=c++17</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -Wall</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -Wextra</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -o</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> program</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> source.cpp</span></span></code></pre>
-<h3 id="basic-c-template"><a class="heading-anchor" href="#basic-c-template">Basic C++ Template</a></h3>
-<p>Here’s a template we’ll use for most examples:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;iostream></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;vector></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;algorithm></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;string></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;unordered_map></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;unordered_set></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;queue></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;stack></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;climits></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;cmath></span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">using</span><span style="color:#D73A49;--shiki-dark:#F97583"> namespace</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> std</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> main</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">    // Your code here</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<h2 id="16-common-c-data-structures-and-libraries"><a class="heading-anchor" href="#16-common-c-data-structures-and-libraries">1.6 Common C++ Data Structures and Libraries</a></h2>
-<h3 id="standard-template-library-stl-containers"><a class="heading-anchor" href="#standard-template-library-stl-containers">Standard Template Library (STL) Containers</a></h3>
-<h4 id="sequential-containers"><a class="heading-anchor" href="#sequential-containers">Sequential Containers</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;vector></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;array></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;deque></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;list></span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Dynamic array</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> vec </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Fixed-size array</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">array</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Double-ended queue</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">deque</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> dq </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Doubly linked list</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">list</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> lst </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span></code></pre>
-<h4 id="associative-containers"><a class="heading-anchor" href="#associative-containers">Associative Containers</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;map></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;unordered_map></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;set></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;unordered_set></span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Ordered map (red-black tree)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">map</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">string, </span><span style="color:#D73A49;--shiki-dark:#F97583">int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> mp;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">mp[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"apple"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Hash map</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">unordered_map</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8">string, </span><span style="color:#D73A49;--shiki-dark:#F97583">int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ump;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">ump[</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"apple"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">] </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Ordered set</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">set</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> s;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">s.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">insert</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Hash set</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">unordered_set</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> us;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">us.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">insert</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span></code></pre>
-<h4 id="container-adapters"><a class="heading-anchor" href="#container-adapters">Container Adapters</a></h4>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;stack></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;queue></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;priority_queue></span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Stack (LIFO)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">stack</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stk;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">stk.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">push</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> top </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> stk.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">top</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">stk.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">pop</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Queue (FIFO)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">queue</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> q;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">q.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">push</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> front </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> q.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">front</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">q.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">pop</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Priority queue (heap)</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">priority_queue</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pq;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">pq.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">push</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> top </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pq.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">top</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">pq.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">pop</span><span style="color:#24292E;--shiki-dark:#E1E4E8">();</span></span></code></pre>
-<h3 id="common-algorithms"><a class="heading-anchor" href="#common-algorithms">Common Algorithms</a></h3>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;algorithm></span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> vec </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Sorting</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">sort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">());</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Binary search</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">bool</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> found </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> binary_search</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Finding elements</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">auto</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> it </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> find</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), </span><span style="color:#005CC5;--shiki-dark:#79B8FF">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Counting</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> count </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> count</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Accumulating</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> sum </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> accumulate</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), </span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Reversing</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">reverse</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), vec.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">());</span></span></code></pre>
-<h2 id="17-example-your-first-algorithm"><a class="heading-anchor" href="#17-example-your-first-algorithm">1.7 Example: Your First Algorithm</a></h2>
-<p>Let’s implement a simple algorithm to find the maximum element in an array:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;iostream></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;vector></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">#include</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> &#x3C;algorithm></span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">using</span><span style="color:#D73A49;--shiki-dark:#F97583"> namespace</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> std</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Method 1: Using STL</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findMaxSTL</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">empty</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        throw</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> invalid_argument</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Array is empty"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#6F42C1;--shiki-dark:#B392F0">max_element</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(), arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">());</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Method 2: Manual implementation</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findMaxManual</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">empty</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        throw</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> invalid_argument</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Array is empty"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">];</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">size_t</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; i </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">size</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); </span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">i) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr[i] </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            maxVal </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[i];</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">// Method 3: Using iterator</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findMaxIterator</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">const</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> vector</span><span style="color:#24292E;--shiki-dark:#E1E4E8">&#x3C;</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">></span><span style="color:#D73A49;--shiki-dark:#F97583">&#x26;</span><span style="color:#E36209;--shiki-dark:#FFAB70"> arr</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">empty</span><span style="color:#24292E;--shiki-dark:#E1E4E8">()) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        throw</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> invalid_argument</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"Array is empty"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr[</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">];</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">auto</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> it </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">begin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; it </span><span style="color:#D73A49;--shiki-dark:#F97583">!=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> arr.</span><span style="color:#6F42C1;--shiki-dark:#B392F0">end</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(); </span><span style="color:#D73A49;--shiki-dark:#F97583">++</span><span style="color:#24292E;--shiki-dark:#E1E4E8">it) {</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">        if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8">it </span><span style="color:#D73A49;--shiki-dark:#F97583">></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">            maxVal </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#24292E;--shiki-dark:#E1E4E8">it;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> maxVal;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> main</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    vector</span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;int></span><span style="color:#24292E;--shiki-dark:#E1E4E8"> numbers </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> {</span><span style="color:#005CC5;--shiki-dark:#79B8FF">3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">7</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">9</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">8</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">};</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Array: "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num : numbers) {</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">        cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> num </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> " "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Maximum (STL): "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findMaxSTL</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(numbers) </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Maximum (Manual): "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findMaxManual</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(numbers) </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    cout </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Maximum (Iterator): "</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> findMaxIterator</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(numbers) </span><span style="color:#D73A49;--shiki-dark:#F97583">&#x3C;&#x3C;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> endl;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    </span></span>
-<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    return</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-<h3 id="analysis-of-the-algorithm"><a class="heading-anchor" href="#analysis-of-the-algorithm">Analysis of the Algorithm</a></h3>
-<ul>
-<li><strong>Time Complexity</strong>: O(n) - We need to examine each element once</li>
-<li><strong>Space Complexity</strong>: O(1) - We only use a constant amount of extra space</li>
-<li><strong>Best Case</strong>: O(n) - Even if the maximum is the first element, we still need to verify</li>
-<li><strong>Worst Case</strong>: O(n) - Same as best case for this algorithm</li>
-</ul>
-<h2 id="18-key-takeaways"><a class="heading-anchor" href="#18-key-takeaways">1.8 Key Takeaways</a></h2>
-<ol>
-<li><strong>Data structures</strong> organize data for efficient access and modification</li>
-<li><strong>Algorithms</strong> are systematic procedures for solving problems</li>
-<li><strong>Problem-solving</strong> requires understanding, design, analysis, implementation, and testing</li>
-<li><strong>Modern C++</strong> provides powerful tools through the Standard Template Library</li>
-<li><strong>Performance analysis</strong> is crucial for choosing the right approach</li>
-</ol>
-<h2 id="19-exercises"><a class="heading-anchor" href="#19-exercises">1.9 Exercises</a></h2>
-<ol>
-<li>Implement a function to find the minimum element in an array using three different approaches.</li>
-<li>Write a function that counts the number of occurrences of a specific value in an array.</li>
-<li>Create a function that reverses an array in-place.</li>
-<li>Implement a function that checks if an array contains duplicate elements.</li>
-<li>Write a function that finds the second largest element in an array.</li>
-</ol>
-<h2 id="110-summary"><a class="heading-anchor" href="#110-summary">1.10 Summary</a></h2>
-<p>This chapter introduced the fundamental concepts of data structures and algorithms, explained their importance in computer science and software engineering, and provided a foundation for the systematic approach to problem-solving that we’ll use throughout this book. We also set up our programming environment and reviewed essential C++ features that will be used in subsequent chapters.</p>
-<p>In the next chapter, we’ll dive deeper into analyzing the efficiency of algorithms using Big O notation and complexity analysis techniques.</p></div><nav class="mt-20 grid gap-3 sm:grid-cols-2"><div></div><a href="/chapters/complexity-analysis" class="rounded-xl border p-4 text-right no-underline transition-colors hover:bg-[var(--surface-2)] sm:col-start-2" style="border-color: var(--border)"><div class="text-xs" style="color: var(--text-muted)">Chapter 2 →</div><div class="mt-1 text-sm font-semibold" style="color: var(--text-primary)">Time and Space Complexity Analysis</div></a></nav><div class="mt-14"></div></article><aside class="hidden lg:block"><div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"><div class="mb-3 text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">On this page</div><ul class="space-y-1.5 text-sm"><li style="padding-left: 0rem"><a href="#11-what-are-data-structures-and-algorithms" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.1 What Are Data Structures and Algorithms?</a></li><li style="padding-left: 0.75rem"><a href="#data-structures" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Data Structures</a></li><li style="padding-left: 0.75rem"><a href="#algorithms" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Algorithms</a></li><li style="padding-left: 0rem"><a href="#12-who-this-book-is-for" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.2 Who This Book Is For</a></li><li style="padding-left: 0.75rem"><a href="#target-audience" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Target Audience</a></li><li style="padding-left: 0.75rem"><a href="#learning-approach" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Learning Approach</a></li><li style="padding-left: 0rem"><a href="#13-why-dsa-matters-real-world-impact" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.3 Why DSA Matters: Real-World Impact</a></li><li style="padding-left: 0.75rem"><a href="#real-world-applications" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Real-World Applications</a></li><li style="padding-left: 0.75rem"><a href="#why-study-data-structures-and-algorithms" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Why Study Data Structures and Algorithms?</a></li><li style="padding-left: 0.75rem"><a href="#dsa-in-the-software-stack" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">DSA in the Software Stack</a></li><li style="padding-left: 0rem"><a href="#13-problem-solving-methodology" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.3 Problem-Solving Methodology</a></li><li style="padding-left: 0.75rem"><a href="#step-1-understand-the-problem" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Step 1: Understand the Problem</a></li><li style="padding-left: 0.75rem"><a href="#step-2-design-the-algorithm" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Step 2: Design the Algorithm</a></li><li style="padding-left: 0.75rem"><a href="#step-3-analyze-complexity" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Step 3: Analyze Complexity</a></li><li style="padding-left: 0.75rem"><a href="#step-4-implement-the-solution" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Step 4: Implement the Solution</a></li><li style="padding-left: 0.75rem"><a href="#step-5-test-and-optimize" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Step 5: Test and Optimize</a></li><li style="padding-left: 0rem"><a href="#14-how-to-use-this-book" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.4 How to Use This Book</a></li><li style="padding-left: 0.75rem"><a href="#learning-paths" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Learning Paths</a></li><li style="padding-left: 0.75rem"><a href="#what-to-expect" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">What to Expect</a></li><li style="padding-left: 0.75rem"><a href="#prerequisites" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Prerequisites</a></li><li style="padding-left: 0.75rem"><a href="#visual-roadmap" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Visual Roadmap</a></li><li style="padding-left: 0rem"><a href="#15-programming-environment-setup" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.5 Programming Environment Setup</a></li><li style="padding-left: 0.75rem"><a href="#c-compiler-setup" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">C++ Compiler Setup</a></li><li style="padding-left: 0.75rem"><a href="#compilation-commands" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Compilation Commands</a></li><li style="padding-left: 0.75rem"><a href="#basic-c-template" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Basic C++ Template</a></li><li style="padding-left: 0rem"><a href="#16-common-c-data-structures-and-libraries" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.6 Common C++ Data Structures and Libraries</a></li><li style="padding-left: 0.75rem"><a href="#standard-template-library-stl-containers" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Standard Template Library (STL) Containers</a></li><li style="padding-left: 0.75rem"><a href="#common-algorithms" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Common Algorithms</a></li><li style="padding-left: 0rem"><a href="#17-example-your-first-algorithm" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.7 Example: Your First Algorithm</a></li><li style="padding-left: 0.75rem"><a href="#analysis-of-the-algorithm" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Analysis of the Algorithm</a></li><li style="padding-left: 0rem"><a href="#18-key-takeaways" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.8 Key Takeaways</a></li><li style="padding-left: 0rem"><a href="#19-exercises" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.9 Exercises</a></li><li style="padding-left: 0rem"><a href="#110-summary" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">1.10 Summary</a></li></ul></div></aside></div></main><footer class="mt-24 border-t" style="border-color: var(--border)"><div class="mx-auto max-w-6xl px-5 py-10 text-sm" style="color: var(--text-muted)"><p>A free, open-source book. MIT licensed —<a href="https://github.com/sb2k16/data-structures-book" class="underline" style="color: var(--text-secondary)" rel="noopener">read it, fork it, teach from it</a>.</p><p class="mt-1.5">Every benchmark on this site runs in your browser. Nothing is uploaded, and no result leaves the tab.</p></div></footer><script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.rNgEMDoa.js"></script></body></html>
+<p>Let’s begin where every performance conversation should: with <a href="/chapters/complexity-analysis">what the machine actually
+does</a>, and why the tidy <code>O(1)</code> you were promised is only half the truth.</p></div><nav class="mt-20 grid gap-3 sm:grid-cols-2"><div></div><a href="/chapters/complexity-analysis" class="rounded-xl border p-4 text-right no-underline transition-colors hover:bg-[var(--surface-2)] sm:col-start-2" style="border-color: var(--border)"><div class="text-xs" style="color: var(--text-muted)">Chapter 2 →</div><div class="mt-1 text-sm font-semibold" style="color: var(--text-primary)">Time and Space Complexity Analysis</div></a></nav><div class="mt-10"></div><div class="mt-8"></div></article><aside class="hidden lg:block"><div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"><div class="mb-3 text-xs font-semibold uppercase tracking-wider" style="color: var(--text-muted)">On this page</div><ul class="space-y-1.5 text-sm"><li style="padding-left: 0rem"><a href="#the-through-line" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">The through-line</a></li><li style="padding-left: 0rem"><a href="#who-this-is-for" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">Who this is for</a></li><li style="padding-left: 0rem"><a href="#how-to-read-it" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">How to read it</a></li><li style="padding-left: 0rem"><a href="#what-each-chapter-gives-you" class="block no-underline leading-snug transition-colors hover:text-[var(--text-primary)]" style="color: var(--text-muted)">What each chapter gives you</a></li></ul></div></aside></div></main><footer class="mt-24 border-t" style="border-color: var(--border)"><div class="mx-auto max-w-6xl px-5 py-10 text-sm" style="color: var(--text-muted)"><p>A free, open-source book. MIT licensed —<a href="https://github.com/sb2k16/data-structures-book" class="underline" style="color: var(--text-secondary)" rel="noopener">read it, fork it, teach from it</a>.</p><p class="mt-1.5">Every benchmark on this site runs in your browser. Nothing is uploaded, and no result leaves the tab.</p></div></footer><script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.rNgEMDoa.js"></script></body></html>
